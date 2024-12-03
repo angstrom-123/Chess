@@ -1,4 +1,4 @@
-package com.ang;
+package com.ang.Util;
 
 import com.ang.Pieces.Piece;
 import com.ang.Pieces.PieceColour;

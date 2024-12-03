@@ -1,4 +1,4 @@
-package com.ang;
+package com.ang.Util;
 
 public class MoveList {
     private int[] elements; // regular moves

@@ -1,5 +1,6 @@
 package com.ang;
 
+import com.ang.Graphics.Renderer;
 import com.ang.Pieces.Bishop;
 import com.ang.Pieces.King;
 import com.ang.Pieces.Knight;
@@ -9,13 +10,19 @@ import com.ang.Pieces.PieceColour;
 import com.ang.Pieces.PieceType;
 import com.ang.Pieces.Queen;
 import com.ang.Pieces.Rook;
+import com.ang.Util.BoardRecord;
+import com.ang.Util.MoveList;
 
-public class Game {
+public class Game implements GameInterface {
     private Piece[] board;
+    private PieceColour colToMove = PieceColour.WHITE;
 
     public Game() {
         board = initBoard("rnbqkbnrpppppppp8888PPPPPPPPRNBQKBNR");
         showBoard();
+
+        Renderer renderer = new Renderer(1.2, this);
+        renderer.drawAllSprites(board);
     }
 
     private Piece[] initBoard(String fen) {
@@ -152,5 +159,9 @@ public class Game {
             }
             System.out.println();
         }
+    }
+
+    public void mouseClick(int x, int y) {
+        System.out.println(x+" "+y);
     }
 }

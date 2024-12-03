@@ -1,7 +1,7 @@
 package com.ang.Pieces;
 
-import com.ang.BoardRecord;
-import com.ang.MoveList;
+import com.ang.Util.BoardRecord;
+import com.ang.Util.MoveList;
 
 public class Queen extends Piece {
     private int pos;
