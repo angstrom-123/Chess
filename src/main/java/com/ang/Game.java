@@ -14,15 +14,21 @@ import com.ang.Util.BoardRecord;
 import com.ang.Util.MoveList;
 
 public class Game implements GameInterface {
-    private Piece[] board;
+    final static int SQUARE_SIZE = 45;
+    final static double RENDER_SCALE = 1.2;
+
+    private BoardRecord currentRec;
     private PieceColour colToMove = PieceColour.WHITE;
+    private Renderer renderer;
 
     public Game() {
-        board = initBoard("rnbqkbnrpppppppp8888PPPPPPPPRNBQKBNR");
+        Piece[] b = initBoard("rnbqkbnrpppppppp8888PPPPPPPPRNBQKBNR");
+        currentRec = new BoardRecord(b, 60, 4, -1);
+
         showBoard();
 
-        Renderer renderer = new Renderer(1.2, this);
-        renderer.drawAllSprites(board);
+        renderer = new Renderer(SQUARE_SIZE, RENDER_SCALE, this);
+        renderer.drawAllSprites(currentRec);
     }
 
     private Piece[] initBoard(String fen) {
@@ -103,29 +109,13 @@ public class Game implements GameInterface {
         return board;
     }
 
-    private MoveList possibleMoves(int index, BoardRecord rec) {
-        return rec.board[index].getMoves(rec);
-    }
-
-    private MoveList possibleMoves(PieceColour col, BoardRecord rec) {
-        MoveList moves = new MoveList(16 * 27);
-        for (int i = 0; i < rec.board.length; i++) {
-            if (rec.colourAt(i) != col) {
-                continue;
-            }
-
-            moves.add(rec.board[i].getMoves(rec));
-        }
-        return moves;
-    }
-
     private void showBoard() {
         System.out.println();
         for (int y = 0; y < 8; y++) {
             for (int x = 0; x < 8; x++) {
                 int index = y * 8 + x;
-                PieceColour col = board[index].colour();
-                PieceType typ = board[index].type();
+                PieceColour col = currentRec.board[index].colour();
+                PieceType typ = currentRec.board[index].type();
                 char out;
                 switch (typ) {
                     case PAWN:
@@ -162,6 +152,24 @@ public class Game implements GameInterface {
     }
 
     public void mouseClick(int x, int y) {
-        System.out.println(x+" "+y);
+        double actualSquareSize = Math.round(SQUARE_SIZE * RENDER_SCALE);
+        int xCoord = (int)Math.floor((double)x / actualSquareSize);
+        int yCoord = (int)Math.floor((double)y / actualSquareSize);
+        int index = yCoord * 8 + xCoord;   
+
+        MoveList moves = currentRec.possibleMoves(index);
+        for (int i = 0; i < moves.length() - 1; i++) {
+            System.out.println(moves.at(i));
+        }
+        System.out.println();
+
+        renderer.drawBoard();  
+        renderer.highlightSquare(xCoord, yCoord); 
+        renderer.drawAllSprites(currentRec);  
+    }
+
+    public boolean makeMove() {
+        // TODO: implement move test and move make
+        return false;
     }
 }

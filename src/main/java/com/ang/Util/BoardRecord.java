@@ -10,6 +10,13 @@ public class BoardRecord {
     public int blackKingPos;
     public int epPawnPos;
 
+    public BoardRecord(Piece[] board, int white, int black, int epPawn) {
+        this.board = board;
+        this.whiteKingPos = white;
+        this.blackKingPos = black;
+        this.epPawnPos = epPawn;
+    }
+
     public void set(BoardRecord rec) {
         this.board = rec.board;
         this.whiteKingPos = rec.whiteKingPos;
@@ -17,14 +24,20 @@ public class BoardRecord {
         this.epPawnPos = rec.epPawnPos;
     }
 
-    public void move(int from, int to, boolean enPassant) {
-        board[to] = board[from];
-        board[from] = new Piece();
-        
-        if (enPassant) { 
-            board[epPawnPos] = null;
-            epPawnPos = -1;
+    public MoveList possibleMoves(int index) {
+        return board[index].getMoves(this);
+    }
+
+    public MoveList possibleMoves(PieceColour col) {
+        MoveList moves = new MoveList(16 * 27);
+        for (int i = 0; i < board.length; i++) {
+            if (colourAt(i) != col) {
+                continue;
+            }
+
+            moves.add(board[i].getMoves(this));
         }
+        return moves;
     }
 
     public PieceType pieceAt(int pos) {

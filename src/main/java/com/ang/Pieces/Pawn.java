@@ -4,14 +4,10 @@ import com.ang.Util.BoardRecord;
 import com.ang.Util.MoveList;
 
 public class Pawn extends Piece {
-    private int pos;
     private int dir;
-    private PieceColour col;
-    private boolean moved = false;
 
     public Pawn(int pos, PieceColour col) {
-        this.pos = pos;
-        this.col = col;
+        super(pos, col);
 
         if (col == PieceColour.BLACK) {
             dir = -1;
@@ -27,12 +23,12 @@ public class Pawn extends Piece {
         int move;
         
         move = -8 * dir;
-        if (rec.pieceAt(pos + move) == null) {
+        if (rec.pieceAt(pos + move) == PieceType.NONE) {
             // single push
             if (super.inBounds(pos, move)) { moves.add(pos + move); }
 
             move = -16 * dir;
-            if (rec.pieceAt(pos + move) == null) {
+            if (rec.pieceAt(pos + move) == PieceType.NONE) {
                 // double push
                 if (super.inBounds(pos, move)) { moves.add(pos + move); }
             }
@@ -42,7 +38,7 @@ public class Pawn extends Piece {
         if (rec.colourAt(pos + move) == opCol) {
             // take left
             if (super.inBounds(pos, move)) { moves.add(pos + move); }
-        } else if (rec.pieceAt(pos + move) == null) {
+        } else if (rec.pieceAt(pos + move) == PieceType.NONE) {
             if (rec.epPawnPos == pos -1) {
                 // en passant left
                 if (super.inBounds(pos, move)) { moves.addSpec(pos + move); }
@@ -61,11 +57,6 @@ public class Pawn extends Piece {
         }
 
         return moves;
-    }
-
-    @Override
-    public boolean hasMoved() {
-        return moved;
     }
 
     @Override

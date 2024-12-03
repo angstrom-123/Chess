@@ -15,7 +15,12 @@ public class MoveList {
     }
 
     public void add(MoveList list) {
-        
+        for (int i = end; i < list.length() - 1; i++) {
+            elements[i] = list.at(i);
+            if (list.isSpecial(i)) {
+                specElements[i] = true;
+            }
+        }
     }
 
     public void add(int pos) {
@@ -43,6 +48,15 @@ public class MoveList {
             }
         }
         return false;
+    }
+
+    public int indexOf(int val) {
+        for (int i = 0; i < length() - 1; i++) {
+            if (elements[i] == val) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public boolean isSpecial(int index) {

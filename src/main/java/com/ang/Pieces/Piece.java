@@ -4,12 +4,31 @@ import com.ang.Util.BoardRecord;
 import com.ang.Util.MoveList;
 
 public class Piece {
+    protected int pos;
+    protected PieceColour col;
+    protected boolean moved = false;
+
+    public Piece() {};
+
+    public Piece(int pos, PieceColour col) {
+        this.pos = pos;
+        this.col = col;
+    }
+
+    public void setMoved(boolean moved) {
+        this.moved = moved;
+    }
+
+    public void setPos(int val) {
+        this.pos = val;
+    }
+
     public MoveList getMoves(BoardRecord rec) {
         return new MoveList(0);
     }
 
     public boolean hasMoved() {
-        return false;
+        return this.moved;
     }
 
     public PieceType type() {
@@ -27,20 +46,29 @@ public class Piece {
             case BLACK:
                 return PieceColour.WHITE;
             default:
-                return null;
+                return PieceColour.NONE;
         }
     }
 
     public boolean inBounds(int pos, int offset) {
+        if ((pos + offset > 63) || (pos + offset) < 0) {
+            return false;
+        }
+
         int posX = pos % 8;
         int posY = (int)Math.floor(pos / 8);
-        int offsetX = offset % 8;
-        int offsetY = (int)Math.floor(offset / 8);
 
-        if ((posX + offsetX > -1) && (posX + offsetX < 8)
-                && (posY + offsetY > -1) && (posY + offsetY < 8)) {
-            return true;
+        int offsetX = (pos + offset) % 8;
+        int offsetY = (int)Math.floor((pos + offset) / 8);
+
+        int deltaX = offsetX - posX;
+        int deltaY = offsetY - posY;
+
+        // if the end coord is outside of a 5x5 grid centred on start, OOB
+        if ((Math.abs(deltaX) > 2) || (Math.abs(deltaY) > 2)) {
+            return false;
         }
-        return false;
+
+        return true;
     }
 }

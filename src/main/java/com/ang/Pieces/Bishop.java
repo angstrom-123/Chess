@@ -4,13 +4,8 @@ import com.ang.Util.BoardRecord;
 import com.ang.Util.MoveList;
 
 public class Bishop extends Piece {
-    private int pos;
-    private PieceColour col;
-    private boolean moved = false;
-
     public Bishop(int pos, PieceColour col) {
-        this.pos = pos;
-        this.col = col;
+        super(pos, col);
     }
     
     @Override
@@ -33,11 +28,6 @@ public class Bishop extends Piece {
         }
 
         return moves;
-    }
-
-    @Override
-    public boolean hasMoved() {
-        return moved;
     }
 
     @Override
