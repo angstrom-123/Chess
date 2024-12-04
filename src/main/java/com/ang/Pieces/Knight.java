@@ -15,7 +15,7 @@ public class Knight extends Piece {
 
         for (int move : offsets) {
             if ((super.inBounds(pos, move)) 
-                    && (rec.colourAt(pos + move) != this.col)){
+                    && (rec.colourAt(pos + move) != this.col)) {
                 moves.add(pos + move);
             }
         }

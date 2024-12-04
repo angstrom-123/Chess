@@ -45,7 +45,7 @@ public class Game implements GameInterface {
             selectedSquare = pressedSquare;
         } else if ((selectedSquare > -1) 
                 && (currentBoard.colourAt(pressedSquare) != colToMove)) {
-            boolean moved = makeMove(selectedSquare, pressedSquare);
+            boolean moved = currentBoard.tryMove(selectedSquare, pressedSquare);
             if (moved) {
                 colToMove = (colToMove == PieceColour.WHITE) 
                 ? PieceColour.BLACK 
@@ -55,12 +55,5 @@ public class Game implements GameInterface {
         }
 
         renderer.drawAllSprites(currentBoard);  
-    }
-
-    public boolean makeMove(int from, int to) {
-        // TODO: implement move test and move make
-        System.out.println("from "+from+" to "+to);
-
-        return true;
     }
 }

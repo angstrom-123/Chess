@@ -26,13 +26,17 @@ public class Pawn extends Piece {
         move = -8 * dir;
         if (rec.pieceAt(pos + move) == PieceType.NONE) {
             // single push
-            if (super.inBounds(pos, move)) { moves.add(pos + move); }
+            if (super.inBounds(pos, move)) { 
+                moves.add(pos + move); 
+            }
 
             if (!hasMoved()) {
                 move = -16 * dir;
                 if (rec.pieceAt(pos + move) == PieceType.NONE) {
                     // double push
-                    if (super.inBounds(pos, move)) { moves.add(pos + move); }
+                    if (super.inBounds(pos, move)) { 
+                        moves.add(pos + move); 
+                    }
                 }
             }
             
@@ -41,22 +45,30 @@ public class Pawn extends Piece {
         move = -9 * dir;
         if (rec.colourAt(pos + move) == opCol) {
             // take left
-            if (super.inBounds(pos, move)) { moves.add(pos + move); }
+            if (super.inBounds(pos, move)) { 
+                moves.add(pos + move); 
+            }
         } else if (rec.pieceAt(pos + move) == PieceType.NONE) {
             if (rec.epPawnPos == pos -1) {
                 // en passant left
-                if (super.inBounds(pos, move)) { moves.addSpec(pos + move, SpecialMove.DOUBLE_PUSH); }
+                if (super.inBounds(pos, move)) { 
+                    moves.addSpec(pos + move, SpecialMove.DOUBLE_PUSH); 
+                }
             }
         }
 
         move = -7 * dir;
         if (rec.colourAt(pos + move) == opCol) { 
             // take right
-            if (super.inBounds(pos, move)) { moves.add(pos + move); }
+            if (super.inBounds(pos, move)) { 
+                moves.add(pos + move); 
+            }
         } else {
             if (rec.epPawnPos == pos + 1) {
                 // en passant right
-                if (super.inBounds(pos, move)) { moves.addSpec(pos + move, SpecialMove.DOUBLE_PUSH); }
+                if (super.inBounds(pos, move)) { 
+                    moves.addSpec(pos + move, SpecialMove.DOUBLE_PUSH); 
+                }
             }
         }
 

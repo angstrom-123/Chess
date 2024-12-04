@@ -87,6 +87,10 @@ public class MoveList {
     }
 
     public boolean contains(int val) {
+        if (end == 0) {
+            return false;
+        }
+        
         for (int element : elements) {
             if (element == val) {
                 return true;

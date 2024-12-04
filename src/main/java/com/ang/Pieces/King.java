@@ -11,12 +11,11 @@ public class King extends Piece {
     @Override
     public MoveList getMoves(BoardRecord rec) {
         MoveList moves = new MoveList(8, pos);
-        PieceColour opCol = this.oppositeColour();
         int[] offsets = new int[]{-9, -8, -7, -1, 1, 7, 8, 9};
 
         for (int move : offsets) {
             if ((super.inBounds(pos, move)) 
-                    && (rec.colourAt(pos + move) == opCol)){
+                    && (rec.colourAt(pos + move) != col)){
                 moves.add(pos + move);
             }
         }

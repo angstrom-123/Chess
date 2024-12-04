@@ -11,9 +11,19 @@ public class BoardRecord {
     public int epPawnPos;
 
     public BoardRecord() {}
-    
-    public BoardRecord(BoardRecord rec) {
-        set(rec);
+
+    public BoardRecord copy(BoardRecord rec) {
+        BoardRecord temp = new BoardRecord();
+
+        temp.board = new Piece[64];
+        for (int i = 0; i < temp.board.length; i++) {
+            temp.board[i] = rec.board[i];
+        }
+        temp.whiteKingPos = rec.whiteKingPos;
+        temp.blackKingPos = rec.blackKingPos;
+        temp.epPawnPos = rec.epPawnPos;
+        
+        return temp;
     }
 
     public void set(BoardRecord rec) {
@@ -24,6 +34,8 @@ public class BoardRecord {
     }
 
     public boolean tryMove(int from, int to) {
+        Piece movingPiece = board[from];
+        
         MoveList legal = pieceMoves(from);
         if (!legal.contains(to)) {
             return false;
@@ -35,46 +47,53 @@ public class BoardRecord {
         // boolean cl = (legal.getSpecialMove(SpecialMove.CASTLE_LONG) == to);
         // boolean cs = (legal.getSpecialMove(SpecialMove.CASTLE_SHORT) == to);
 
-        PieceColour opCol = board[from].oppositeColour();
-        int kingSquare = (opCol == PieceColour.BLACK) ? whiteKingPos : blackKingPos;
 
-        BoardRecord tempRec = new BoardRecord(this);
-
-        tempRec.board[to] = board[from];
+        BoardRecord tempRec = copy(this);
+        tempRec.board[to] = movingPiece;
         tempRec.board[from] = new Piece();
-        if (ep) {
-            tempRec.board[epPawnPos] = new Piece();
+        if (movingPiece.type() == PieceType.KING) {
+            tempRec.updateKingPositions(movingPiece.colour(), to);
         }
 
-        MoveList[] enemyMoves = tempRec.possibleMoves(opCol);
+        MoveList[] enemyMoves = tempRec.possibleMoves(movingPiece.oppositeColour());
+        int kingSquare = (movingPiece.colour() == PieceColour.WHITE) 
+        ? tempRec.whiteKingPos 
+        : tempRec.blackKingPos;
         for (MoveList list : enemyMoves) {
+            if (list == null) {
+                continue;
+            }
             if (list.contains(kingSquare)) {
                 return false;
             }
         }
 
-        board[to] = board[from];
+        board[to] = movingPiece;
         board[from] = new Piece();
         board[to].setPos(to);
         if (ep) { 
             board[epPawnPos] = new Piece(); 
         }
-        if (pieceAt(to) == PieceType.KING) {
-            switch (opCol) {
-                case BLACK:
-                    whiteKingPos = to;
-                    break;
-                case WHITE:
-                    blackKingPos = to;
-                    break;
-                default:
-                    break;
-            }
+        if (movingPiece.type() == PieceType.KING) {
+            updateKingPositions(movingPiece.colour(), to);
         }
         epPawnPos = (dp) ? to : -1;
         board[to].setMoved(true); 
 
         return true;
+    }
+
+    private void updateKingPositions(PieceColour col, int pos) {
+        switch (col) {
+            case WHITE:
+                whiteKingPos = pos;
+                break;
+            case BLACK:
+                blackKingPos = pos;
+                break;
+            default:
+                break;
+        }
     }
 
     public MoveList pieceMoves(int index) {

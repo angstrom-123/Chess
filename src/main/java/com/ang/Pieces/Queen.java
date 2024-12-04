@@ -11,19 +11,24 @@ public class Queen extends Piece {
     @Override
     public MoveList getMoves(BoardRecord rec) {
         MoveList moves = new MoveList(30, pos);
-        PieceColour opCol = this.oppositeColour();
 
         int[] offsets = new int[]{-9, -8, -7, -1, 1, 7, 8, 9};
         for (int direction : offsets) {
             int step = 1;
+            int stepPos = pos;
             while (step < 8) {
-                int move = direction * step;
-                if ((!super.inBounds(pos, move)
-                        || (rec.colourAt(pos + move) != opCol))) {
+                if ((!super.inBounds(stepPos, direction))
+                        || (rec.colourAt(stepPos + direction) == col)) {
+                    break;
+                }
+                if (rec.colourAt(stepPos + direction) == this.oppositeColour()) {
+                    moves.add(stepPos + direction);
                     break;
                 }
                 
-                moves.add(pos + move);
+                moves.add(stepPos + direction);
+                stepPos += direction;
+                step++;
             }
         }
 
