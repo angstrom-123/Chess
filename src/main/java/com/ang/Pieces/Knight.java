@@ -10,7 +10,7 @@ public class Knight extends Piece {
 
     @Override
     public MoveList getMoves(BoardRecord rec) {
-        MoveList moves = new MoveList(8);
+        MoveList moves = new MoveList(8, pos);
         int[] offsets = new int[]{-17, -15, -10, -6, 6, 10, 15, 17};
 
         for (int move : offsets) {

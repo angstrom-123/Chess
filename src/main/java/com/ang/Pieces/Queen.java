@@ -10,7 +10,7 @@ public class Queen extends Piece {
     
     @Override
     public MoveList getMoves(BoardRecord rec) {
-        MoveList moves = new MoveList(30);
+        MoveList moves = new MoveList(30, pos);
         PieceColour opCol = this.oppositeColour();
 
         int[] offsets = new int[]{-9, -8, -7, -1, 1, 7, 8, 9};

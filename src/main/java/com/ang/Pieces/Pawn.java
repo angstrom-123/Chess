@@ -2,6 +2,7 @@ package com.ang.Pieces;
 
 import com.ang.Util.BoardRecord;
 import com.ang.Util.MoveList;
+import com.ang.Util.SpecialMove;
 
 public class Pawn extends Piece {
     private int dir;
@@ -18,7 +19,7 @@ public class Pawn extends Piece {
 
     @Override
     public MoveList getMoves(BoardRecord rec) {
-        MoveList moves = new MoveList(6);
+        MoveList moves = new MoveList(6, pos);
         PieceColour opCol = this.oppositeColour();
         int move;
         
@@ -27,11 +28,14 @@ public class Pawn extends Piece {
             // single push
             if (super.inBounds(pos, move)) { moves.add(pos + move); }
 
-            move = -16 * dir;
-            if (rec.pieceAt(pos + move) == PieceType.NONE) {
-                // double push
-                if (super.inBounds(pos, move)) { moves.add(pos + move); }
+            if (!hasMoved()) {
+                move = -16 * dir;
+                if (rec.pieceAt(pos + move) == PieceType.NONE) {
+                    // double push
+                    if (super.inBounds(pos, move)) { moves.add(pos + move); }
+                }
             }
+            
         }
         
         move = -9 * dir;
@@ -41,7 +45,7 @@ public class Pawn extends Piece {
         } else if (rec.pieceAt(pos + move) == PieceType.NONE) {
             if (rec.epPawnPos == pos -1) {
                 // en passant left
-                if (super.inBounds(pos, move)) { moves.addSpec(pos + move); }
+                if (super.inBounds(pos, move)) { moves.addSpec(pos + move, SpecialMove.DOUBLE_PUSH); }
             }
         }
 
@@ -52,7 +56,7 @@ public class Pawn extends Piece {
         } else {
             if (rec.epPawnPos == pos + 1) {
                 // en passant right
-                if (super.inBounds(pos, move)) { moves.addSpec(pos + move); }
+                if (super.inBounds(pos, move)) { moves.addSpec(pos + move, SpecialMove.DOUBLE_PUSH); }
             }
         }
 

@@ -10,7 +10,7 @@ public class Bishop extends Piece {
     
     @Override
     public MoveList getMoves(BoardRecord rec) {
-        MoveList moves = new MoveList(30);
+        MoveList moves = new MoveList(30, pos);
         PieceColour opCol = this.oppositeColour();
 
         int[] offsets = new int[]{-9, -7, 7, 9};

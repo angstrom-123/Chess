@@ -10,7 +10,7 @@ public class King extends Piece {
 
     @Override
     public MoveList getMoves(BoardRecord rec) {
-        MoveList moves = new MoveList(8);
+        MoveList moves = new MoveList(8, pos);
         PieceColour opCol = this.oppositeColour();
         int[] offsets = new int[]{-9, -8, -7, -1, 1, 7, 8, 9};
 
@@ -23,7 +23,7 @@ public class King extends Piece {
         
         return moves;
     }
-    
+
     @Override
     public PieceType type() {
         return PieceType.KING;

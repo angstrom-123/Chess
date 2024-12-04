@@ -6,7 +6,7 @@ import com.ang.Pieces.PieceColour;
 import com.ang.Pieces.PieceType;
 import com.ang.Util.BoardRecord;
 import com.ang.Util.InputHandler;
-import com.ang.Util.MoveList;
+// import com.ang.Util.MoveList;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -30,19 +30,22 @@ public class Renderer extends JFrame {
     private JFrame frame;
     private GameInterface gameInterface;
 
+    private BufferedImage[] sprites;
+
     public Renderer(int squareSize, double scale, GameInterface gameInterface) {
         this.squareSize = squareSize;
         this.scale = scale;
         this.gameInterface = gameInterface;
 
         init();
+        loadSprites();
         drawBoard();
     }
 
     public void init() {
         size = squareSize * 8;
         Dimension paneDimension = new Dimension((int)Math.round(size * scale),
-                                                (int)Math.round(size * scale));
+                (int)Math.round(size * scale));
 
         img = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
         imgPanel = new ImagePanel(img);
@@ -65,6 +68,80 @@ public class Renderer extends JFrame {
 
         frame.setFocusable(true);
         frame.requestFocusInWindow();
+    }
+
+    public void loadSprites() {
+        sprites = new BufferedImage[13];
+        int end = 0;
+        String[] paths = new String[]{
+            "/PawnSprite.png",
+            "/KnightSprite.png",
+            "/BishopSprite.png",
+            "/RookSprite.png",
+            "/QueenSprite.png",
+            "/KingSprite.png",
+            "/StarSprite.png"};
+
+        for (int i = 0; i < paths.length; i++) {
+            BufferedImage s = new BufferedImage(squareSize, squareSize,
+                    BufferedImage.TYPE_INT_ARGB);
+            BufferedImage white = new BufferedImage(squareSize, squareSize,
+                    BufferedImage.TYPE_INT_ARGB);
+            BufferedImage black = new BufferedImage(squareSize, squareSize,
+                    BufferedImage.TYPE_INT_ARGB);
+            try {
+                s = ImageIO.read(this.getClass().getResource(paths[i]));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            if (i == paths.length - 1) {
+                sprites[end] = s;
+                continue;
+            }
+
+            Colour lightTint = new Colour(255, 255, 255);
+            Colour darkTint = new Colour(0, 0, 0);
+
+            for (int y = 0; y < squareSize; y++) {
+                for (int x = 0; x < squareSize; x++) {
+                    int samp = s.getRGB(x, y);
+
+                    int alpha = (samp >> 24) & 0xff;
+                    int r = (samp >> 16) & 0xff;
+                    int g = (samp >> 8) & 0xff;
+                    int b = (samp >> 0) & 0xff;
+    
+                    if (r == 0 && g == 0 && b == 0 && alpha == 0xff) {
+                        white.setRGB(x, y, samp);
+                        black.setRGB(x, y, samp);
+                        continue;
+                    }
+    
+                    if (alpha == 0) {
+                        continue;
+                    }
+    
+                    int rLight = (int)Math.round((r + lightTint.r()) / 2);
+                    int gLight = (int)Math.round((g + lightTint.g()) / 2);
+                    int bLight = (int)Math.round((b + lightTint.b()) / 2);
+
+                    int rDark = (int)Math.round((r + darkTint.r()) / 2);
+                    int gDark = (int)Math.round((g + darkTint.g()) / 2);
+                    int bDark = (int)Math.round((b + darkTint.b()) / 2);
+    
+                    int pixelLight = (rLight >> 16) | (gLight >> 8) | (bLight);
+                    int pixelDark = (rDark >> 16) | (gDark >> 8) | (bDark);
+
+                    white.setRGB(x, y, pixelLight);
+                    black.setRGB(x, y, pixelDark);
+                }
+            }
+
+            sprites[end] = white;
+            sprites[end + 1] = black;
+            end += 2;
+        }
     }
 
     public void drawBoard() {
@@ -102,62 +179,38 @@ public class Renderer extends JFrame {
     }
 
     public void drawSprite(int x, int y, PieceType type, PieceColour col) {
-        Colour tint;
-        switch (col) {
-            case WHITE:
-                tint = new Colour(255, 255, 255);
+        int index = 0;
+        switch(type) {
+            case PAWN:
+                index = 0;
                 break;
-            case BLACK:
-                tint = new Colour(0, 0, 0);
+            case KNIGHT:
+                index = 2;
+                break;
+            case BISHOP:
+                index = 4;
+                break;
+            case ROOK:
+                index = 6;
+                break;
+            case QUEEN:
+                index = 8;
+                break;
+            case KING:
+                index = 10;
                 break;
             default:
-                tint = new Colour(127, 127, 127);
                 break;
         }
 
-        BufferedImage s = new BufferedImage(squareSize, squareSize,
-                                            BufferedImage.TYPE_INT_RGB);
-        try {
-            s = ImageIO.read(this.getClass().getResource(type.path()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        for (int j = 0; j < squareSize; j++) {
-            for (int i = 0; i < squareSize; i++) {
-                int samp = s.getRGB(i, j);
-
-                if ((samp & 0xff000000 >> 24) == 0) {
-                    continue;
-                }
-
-                if ((samp & 0x00ffffff) == 0) {
-                    continue;
-                } 
-                int r = samp & 0x00ff0000 >> 16;
-                int g = samp & 0x0000ff00 >> 8;
-                int b = samp & 0x000000ff;
-
-                r = (int)Math.round((r + tint.r()) / 2);
-                g = (int)Math.round((g + tint.g()) / 2);
-                b = (int)Math.round((b + tint.b()) / 2);
-
-                int pixelCol = (r >> 16) | (g >> 8) | (b);
-                s.setRGB(i, j, pixelCol);
-            }
-        }
+        index = (col == PieceColour.WHITE) ? index : index + 1;
+        BufferedImage s = sprites[index];
 
         drawSprite(x, y, s);
     }
 
     public void drawMarker(int x, int y) {
-        BufferedImage s = new BufferedImage(squareSize, squareSize, 
-                                            BufferedImage.TYPE_INT_RGB);
-        try {
-            s = ImageIO.read(this.getClass().getResource("/StarSprite.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        BufferedImage s = sprites[12];
 
         drawSprite(x, y, s);
     }
@@ -206,18 +259,14 @@ public class Renderer extends JFrame {
         frame.repaint();
     }
 
-    public void mouseClick(int x, int y) {
-        highlightSquare(x, y); // debug highlighting
-    }
+    // public void showMoves(MoveList moves) {
+    //     for (int i = 0; i < moves.length() - 1; i++) {
+    //         int x = moves.at(i) % 8;
+    //         int y = (int)Math.floor(moves.at(i) / 8);
+    //         drawMarker(x, y);
+    //     }
 
-    public void showMoves(MoveList moves) {
-        for (int i = 0; i < moves.length() - 1; i++) {
-            int x = moves.at(i) % 8;
-            int y = (int)Math.floor(moves.at(i) / 8);
-            drawMarker(x, y);
-        }
-
-        frame.repaint();
-    }
+    //     frame.repaint();
+    // }
 }
    

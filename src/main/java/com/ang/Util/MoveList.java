@@ -1,25 +1,35 @@
 package com.ang.Util;
 
 public class MoveList {
+    private int origin;
+
     private int[] elements; // regular moves
-    private boolean[] specElements; // special moves (castling, en-passant)
+    private int doublePush = -1;
+    private int castleShort = -1;
+    private int castleLong = -1;
+    private int enPassant = -1;
+    private int promotion = -1;
+
     private int end = 0;
 
-    public MoveList(int maxElements) {
+    public MoveList() {};
+
+    public MoveList(int maxElements, int origin) {
+        this.origin = origin;
+
         elements = new int[maxElements];
-        specElements = new boolean[maxElements];
         for (int i = 0; i < maxElements; i++) {
             elements[i] = -1;
-            specElements[i] = false;
         }
+    }
+
+    public int getFrom() {
+        return origin;
     }
 
     public void add(MoveList list) {
         for (int i = end; i < list.length() - 1; i++) {
             elements[i] = list.at(i);
-            if (list.isSpecial(i)) {
-                specElements[i] = true;
-            }
         }
     }
 
@@ -28,9 +38,44 @@ public class MoveList {
         end++;
     }
 
-    public void addSpec(int pos) {
-        specElements[end] = true;
+    public void addSpec(int pos, SpecialMove spec) {
+        switch (spec) {
+            case DOUBLE_PUSH:
+                doublePush = pos;
+                break;
+            case CASTLE_LONG:
+                castleLong = pos;
+                break;
+            case CASTLE_SHORT:
+                castleShort = pos;
+                break;
+            case EN_PASSANT:
+                enPassant = pos;
+                break;
+            case PROMOTION:
+                promotion = pos;
+                break;
+            default:
+                break;
+        }
         add(pos);
+    }
+
+    public int getSpecialMove(SpecialMove move) {
+        switch (move) {
+            case DOUBLE_PUSH:
+                return doublePush;
+            case CASTLE_LONG:
+                return castleLong;
+            case CASTLE_SHORT:
+                return castleShort;
+            case EN_PASSANT:
+                return enPassant;
+            case PROMOTION:
+                return promotion;
+            default:
+                return -1;
+        }
     }
 
     public int length() {
@@ -57,9 +102,5 @@ public class MoveList {
             }
         }
         return -1;
-    }
-
-    public boolean isSpecial(int index) {
-        return (specElements[index]);
     }
 }
