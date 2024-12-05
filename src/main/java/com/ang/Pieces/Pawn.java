@@ -27,6 +27,9 @@ public class Pawn extends Piece {
         if (rec.pieceAt(pos + move) == PieceType.NONE) {
             // single push
             if (super.inBounds(pos, move)) { 
+                if ((pos < 8) || (pos >55)) {
+                    moves.addSpec(pos + move, SpecialMove.PROMOTION);
+                }
                 moves.add(pos + move); 
             }
 
@@ -35,14 +38,14 @@ public class Pawn extends Piece {
                 if (rec.pieceAt(pos + move) == PieceType.NONE) {
                     // double push
                     if (super.inBounds(pos, move)) { 
-                        moves.add(pos + move); 
+                        moves.addSpec(pos + move, SpecialMove.DOUBLE_PUSH); 
                     }
                 }
             }
             
         }
         
-        move = -9 * dir;
+        move = (-8 * dir) - 1;
         if (rec.colourAt(pos + move) == opCol) {
             // take left
             if (super.inBounds(pos, move)) { 
@@ -52,12 +55,12 @@ public class Pawn extends Piece {
             if (rec.epPawnPos == pos -1) {
                 // en passant left
                 if (super.inBounds(pos, move)) { 
-                    moves.addSpec(pos + move, SpecialMove.DOUBLE_PUSH); 
+                    moves.addSpec(pos + move, SpecialMove.EN_PASSANT); 
                 }
             }
         }
 
-        move = -7 * dir;
+        move = (-8 * dir) + 1;
         if (rec.colourAt(pos + move) == opCol) { 
             // take right
             if (super.inBounds(pos, move)) { 
@@ -67,7 +70,7 @@ public class Pawn extends Piece {
             if (rec.epPawnPos == pos + 1) {
                 // en passant right
                 if (super.inBounds(pos, move)) { 
-                    moves.addSpec(pos + move, SpecialMove.DOUBLE_PUSH); 
+                    moves.addSpec(pos + move, SpecialMove.EN_PASSANT); 
                 }
             }
         }

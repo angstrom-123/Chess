@@ -1,6 +1,6 @@
 package com.ang.Util;
 
-import com.ang.Pieces.Piece;
+import com.ang.Pieces.*;
 import com.ang.Pieces.PieceColour;
 import com.ang.Pieces.PieceType;
 
@@ -58,7 +58,9 @@ public class BoardRecord {
 
         movePiece(from, to);
         board[to].setPos(to);
-        if (ep) { 
+
+        if (ep) {
+            System.out.println("ep"); 
             board[epPawnPos] = new Piece(); 
         }
         epPawnPos = (dp) ? to : -1;
