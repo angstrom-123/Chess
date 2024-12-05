@@ -81,13 +81,11 @@ public class Renderer extends JFrame {
             "/QueenSprite.png",
             "/KingSprite.png",
             "/StarSprite.png"};
+        Colour lightTint = new Colour(255, 255, 255);
+        Colour darkTint = new Colour(0, 0, 0);
 
         for (int i = 0; i < paths.length; i++) {
             BufferedImage s = new BufferedImage(squareSize, squareSize,
-                    BufferedImage.TYPE_INT_ARGB);
-            BufferedImage white = new BufferedImage(squareSize, squareSize,
-                    BufferedImage.TYPE_INT_ARGB);
-            BufferedImage black = new BufferedImage(squareSize, squareSize,
                     BufferedImage.TYPE_INT_ARGB);
             try {
                 s = ImageIO.read(this.getClass().getResource(paths[i]));
@@ -96,52 +94,57 @@ public class Renderer extends JFrame {
             }
 
             if (i == paths.length - 1) {
-                sprites[end] = s;
-                continue;
-            }
-
-            Colour lightTint = new Colour(255, 255, 255);
-            Colour darkTint = new Colour(0, 0, 0);
-
-            for (int y = 0; y < squareSize; y++) {
-                for (int x = 0; x < squareSize; x++) {
-                    int samp = s.getRGB(x, y);
-
-                    int alpha = (samp >> 24) & 0xff;
-                    int r = (samp >> 16) & 0xff;
-                    int g = (samp >> 8) & 0xff;
-                    int b = (samp >> 0) & 0xff;
-    
-                    if (r == 0 && g == 0 && b == 0 && alpha == 0xff) {
-                        white.setRGB(x, y, samp);
-                        black.setRGB(x, y, samp);
-                        continue;
-                    }
-    
-                    if (alpha == 0) {
-                        continue;
-                    }
-    
-                    int rLight = (int)Math.round((r + lightTint.r()) / 2);
-                    int gLight = (int)Math.round((g + lightTint.g()) / 2);
-                    int bLight = (int)Math.round((b + lightTint.b()) / 2);
-
-                    int rDark = (int)Math.round((r + darkTint.r()) / 2);
-                    int gDark = (int)Math.round((g + darkTint.g()) / 2);
-                    int bDark = (int)Math.round((b + darkTint.b()) / 2);
-    
-                    int pixelLight = (rLight >> 16) | (gLight >> 8) | (bLight);
-                    int pixelDark = (rDark >> 16) | (gDark >> 8) | (bDark);
-
-                    white.setRGB(x, y, pixelLight);
-                    black.setRGB(x, y, pixelDark);
+                // sprites[end] = s;
+                // return;
+                try {
+                    s = ImageIO.read(this.getClass().getResource("/StarSprite.png"));
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+                sprites[end] = s;
+                return;
             }
 
-            sprites[end] = white;
-            sprites[end + 1] = black;
+            sprites[end] = tint(s, lightTint);
+            sprites[end + 1] = tint(s, darkTint);
             end += 2;
         }
+    }
+
+    private BufferedImage tint(BufferedImage s, Colour tint) {
+        BufferedImage out = new BufferedImage(squareSize, squareSize,
+                BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < squareSize; y++) {
+            for (int x = 0; x < squareSize; x++) {
+                int samp = s.getRGB(x, y);
+
+                int alpha = (samp >> 24) & 0xff;
+                int r = (samp >> 16) & 0xff;
+                int g = (samp >> 8) & 0xff;
+                int b = (samp >> 0) & 0xff;
+
+                if ((r == 0) && (g == 0) && (b == 0) && (alpha == 0xff)) {
+                    out.setRGB(x, y, samp);
+                    continue;
+                }
+
+                if (alpha == 0) {
+                    continue;
+                }
+
+                int rTinted = (int)Math.round((r + tint.r()) / 2);
+                int gTinted = (int)Math.round((g + tint.g()) / 2);
+                int bTinted = (int)Math.round((b + tint.b()) / 2);
+
+                int pixelTinted = (alpha << 24) 
+                                | (rTinted << 16) 
+                                | (gTinted << 8) 
+                                | (bTinted);
+
+                out.setRGB(x, y, pixelTinted);
+            }
+        }
+        return out;
     }
 
     public void drawBoard() {
@@ -223,18 +226,14 @@ public class Renderer extends JFrame {
             for (int i = 0; i < squareSize; i++) {
                 int samp = s.getRGB(i, j);
 
-                if ((samp & 0xff000000 >> 24) == 0) {
+                int alpha = (samp >> 24) & 0xff;
+                int r = (samp >> 16) & 0xff;
+                int g = (samp >> 8) & 0xff;
+                int b = (samp) & 0xff;
+
+                if (alpha == 0) {
                     continue;
                 }
-
-                if ((samp & 0x00ffffff) == 0) {
-                    Colour pixelCol = new Colour(0, 0, 0);
-                    drawPixel(startX + i, startY + j, pixelCol);
-                    continue;
-                } 
-                int r = samp & 0x00ff0000 >> 16;
-                int g = samp & 0x0000ff00 >> 8;
-                int b = samp & 0x000000ff;
 
                 Colour pixelCol = new Colour(r, g, b);
                 drawPixel(startX + i, startY + j, pixelCol);
