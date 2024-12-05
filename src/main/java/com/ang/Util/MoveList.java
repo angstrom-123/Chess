@@ -95,6 +95,9 @@ public class MoveList {
             if (element == val) {
                 return true;
             }
+            if (element == -1) {
+                return false;
+            }
         }
         return false;
     }

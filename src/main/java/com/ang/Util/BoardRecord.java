@@ -26,13 +26,6 @@ public class BoardRecord {
         return temp;
     }
 
-    public void set(BoardRecord rec) {
-        this.board = rec.board;
-        this.whiteKingPos = rec.whiteKingPos;
-        this.blackKingPos = rec.blackKingPos;
-        this.epPawnPos = rec.epPawnPos;
-    }
-
     public boolean tryMove(int from, int to) {
         Piece movingPiece = board[from];
         
@@ -46,36 +39,27 @@ public class BoardRecord {
         // TODO: implement castling, promotion
         // boolean cl = (legal.getSpecialMove(SpecialMove.CASTLE_LONG) == to);
         // boolean cs = (legal.getSpecialMove(SpecialMove.CASTLE_SHORT) == to);
-
+        // boolean pr = (legal.getSpecialMove(SpecialMove.PROMOTION) == to);
 
         BoardRecord tempRec = copy(this);
-        tempRec.board[to] = movingPiece;
-        tempRec.board[from] = new Piece();
-        if (movingPiece.type() == PieceType.KING) {
-            tempRec.updateKingPositions(movingPiece.colour(), to);
-        }
+        tempRec.movePiece(from, to);
+        for (int i = 0; i < tempRec.board.length; i++) {
+            if (tempRec.colourAt(i) == movingPiece.oppositeColour()) {
+                MoveList moves = tempRec.board[i].getMoves(tempRec);
+                int kingSquare = (movingPiece.colour() == PieceColour.WHITE)
+                ? tempRec.whiteKingPos
+                : tempRec.blackKingPos;
 
-        MoveList[] enemyMoves = tempRec.possibleMoves(movingPiece.oppositeColour());
-        int kingSquare = (movingPiece.colour() == PieceColour.WHITE) 
-        ? tempRec.whiteKingPos 
-        : tempRec.blackKingPos;
-        for (MoveList list : enemyMoves) {
-            if (list == null) {
-                continue;
-            }
-            if (list.contains(kingSquare)) {
-                return false;
+                if (moves.contains(kingSquare)) {
+                    return false;
+                }
             }
         }
 
-        board[to] = movingPiece;
-        board[from] = new Piece();
+        movePiece(from, to);
         board[to].setPos(to);
         if (ep) { 
             board[epPawnPos] = new Piece(); 
-        }
-        if (movingPiece.type() == PieceType.KING) {
-            updateKingPositions(movingPiece.colour(), to);
         }
         epPawnPos = (dp) ? to : -1;
         board[to].setMoved(true); 
@@ -83,16 +67,23 @@ public class BoardRecord {
         return true;
     }
 
-    private void updateKingPositions(PieceColour col, int pos) {
-        switch (col) {
-            case WHITE:
-                whiteKingPos = pos;
-                break;
-            case BLACK:
-                blackKingPos = pos;
-                break;
-            default:
-                break;
+    public void movePiece(int from, int to) {
+        Piece piece = board[from];
+        board[to] = piece;
+        board[from] = new Piece();
+        piece.setMoved(true);
+
+        if (piece.type() == PieceType.KING) {
+            switch (piece.colour()) {
+                case WHITE:
+                    whiteKingPos = to;
+                    break;
+                case BLACK:
+                    blackKingPos = to;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
