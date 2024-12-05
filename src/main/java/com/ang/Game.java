@@ -4,6 +4,7 @@ import com.ang.Graphics.Renderer;
 import com.ang.Pieces.*;
 import com.ang.Util.BoardRecord;
 import com.ang.Util.FENReader;
+import com.ang.Util.MoveList;
 
 public class Game implements GameInterface {
     final static int SQUARE_SIZE = 45;
@@ -37,12 +38,14 @@ public class Game implements GameInterface {
     }
 
     public void squarePressed(int x, int y) {
+        boolean showMoves = false;
         renderer.drawBoard(); 
 
         int pressedSquare = y * 8 + x;   
         if (currentBoard.colourAt(pressedSquare) == colToMove) {
             renderer.highlightSquare(x, y);
             selectedSquare = pressedSquare;
+            showMoves = true;
         } else if ((selectedSquare > -1) 
                 && (currentBoard.colourAt(pressedSquare) != colToMove)) {
             boolean moved = currentBoard.tryMove(selectedSquare, pressedSquare);
@@ -54,6 +57,18 @@ public class Game implements GameInterface {
             }
         }
 
-        renderer.drawAllSprites(currentBoard);  
+        renderer.drawAllSprites(currentBoard);    
+        if (showMoves) {
+            showMoves(selectedSquare);
+        }        
+    }
+
+    public void showMoves(int pos) {
+        MoveList moves = currentBoard.board[selectedSquare].getMoves(currentBoard);
+        for (int i = 0; i < moves.length() - 1; i++) {
+            int markX = moves.at(i) % 8;
+            int markY = (int)Math.floor(moves.at(i) / 8);
+            renderer.drawMarker(markX, markY);
+        }
     }
 }

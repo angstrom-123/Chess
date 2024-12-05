@@ -259,14 +259,5 @@ public class Renderer extends JFrame {
         frame.repaint();
     }
 
-    // public void showMoves(MoveList moves) {
-    //     for (int i = 0; i < moves.length() - 1; i++) {
-    //         int x = moves.at(i) % 8;
-    //         int y = (int)Math.floor(moves.at(i) / 8);
-    //         drawMarker(x, y);
-    //     }
-
-    //     frame.repaint();
-    // }
 }
    
