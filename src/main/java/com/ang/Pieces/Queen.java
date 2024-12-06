@@ -8,6 +8,13 @@ public class Queen extends Piece {
     public Queen(int pos, PieceColour col) {
         super(pos, col);
     }
+
+    @Override
+    public Piece copy() {
+        Queen out = new Queen(pos, col);
+        out.setMoved(this.hasMoved());
+        return out;
+    }
     
     @Override
     public MoveList getMoves(BoardRecord rec) {

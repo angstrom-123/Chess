@@ -19,6 +19,13 @@ public class Pawn extends Piece {
     }
 
     @Override
+    public Piece copy() {
+        Pawn out = new Pawn(pos, col);
+        out.setMoved(this.hasMoved());
+        return out;
+    }
+
+    @Override
     public MoveList getMoves(BoardRecord rec) {
         MoveList moves = new MoveList(6);
         PieceColour opCol = this.oppositeColour();

@@ -10,6 +10,13 @@ public class Knight extends Piece {
     }
 
     @Override
+    public Piece copy() {
+        Knight out = new Knight(pos, col);
+        out.setMoved(this.hasMoved());
+        return out;
+    }
+
+    @Override
     public MoveList getMoves(BoardRecord rec) {
         MoveList moves = new MoveList(8);
         int[] offsets = new int[]{-17, -15, -10, -6, 6, 10, 15, 17};

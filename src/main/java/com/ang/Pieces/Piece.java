@@ -15,6 +15,10 @@ public class Piece {
         this.col = col;
     }
 
+    public Piece copy() {
+        return new Piece();
+    }
+
     public void setMoved(boolean moved) {
         this.moved = moved;
     }

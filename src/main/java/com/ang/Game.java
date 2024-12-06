@@ -57,12 +57,14 @@ public class Game implements GameInterface {
             
             boolean moved = realRec.tryMove(moveToMake);
             if (moved) {
-                colToMove = (colToMove == PieceColour.WHITE) 
-                ? PieceColour.BLACK 
-                : PieceColour.WHITE;
+                // colToMove = (colToMove == PieceColour.WHITE) 
+                // ? PieceColour.BLACK 
+                // : PieceColour.WHITE;
                 selected = -1;
 
-                // engine.generateMove(realRec);
+                Move engineMove = engine.generateMove(realRec);
+                System.out.println("engine move "+engineMove.from()+" "+engineMove.to());
+                System.out.println(realRec.tryMove(engineMove));
             }
         }
 

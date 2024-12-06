@@ -24,17 +24,19 @@ public class Engine {
     //     if move's eval is better than best eval then record the move and eval
     
     public Move generateMove(BoardRecord rec) {
-        Move bestMove = new Move();
-
+        Move bestMove = Move.invalid();
         double bestEval = Global.infinity;
+
         MoveList possibleMoves = rec.possibleMoves(PieceColour.BLACK);
-        for (int i = 0; i < possibleMoves.length(); i++) {
+        for (int i = 0; i < possibleMoves.length() - 1; i++) {
             BoardRecord tempRec = rec.copy();
+            Piece testPiece = possibleMoves.at(i).piece().copy();
+            System.out.println(possibleMoves.at(i).from()+" "+possibleMoves.at(i).to());
             if (tempRec.tryMove(possibleMoves.at(i))) {
                 double eval = recurse(tempRec, PieceColour.WHITE, maxDepth, Global.infinity);
-                if (eval > bestEval) {
+                if ((eval < bestEval) || (bestMove.isInvalid())) {
                     bestEval = eval;
-                    bestMove = possibleMoves.at(i);
+                    bestMove = new Move(testPiece, possibleMoves.at(i).from(), possibleMoves.at(i).to());
                 }
             }
         }
@@ -43,7 +45,7 @@ public class Engine {
     }
 
     public double recurse(BoardRecord rec, PieceColour col, int depth, double currentEval) {
-        return 0.0;
+        return evaluate(rec);
     }
 
     private double evaluate(BoardRecord rec) {

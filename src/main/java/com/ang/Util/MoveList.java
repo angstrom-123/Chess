@@ -26,17 +26,27 @@ public class MoveList {
     }
 
     public void add(MoveList list) {
-        for (int i = end; i < list.length() - 1; i++) {
-            elements[i] = list.at(i);
+        for (int i = 0; i < list.length() - 1; i++) {
+            if (list.at(i).equals(Move.invalid())) {
+                continue;
+            }
+            elements[end] = list.at(i);
+            end++;
         }
     }
 
     public void add(Move move) {
+        if (move.equals(Move.invalid())) {
+            return;
+        }
         elements[end] = move;
         end++;
     }
 
     public void addSpec(Move move, SpecialMove spec) {
+        if (move.equals(Move.invalid())) {
+            return;
+        }
         switch (spec) {
             case DOUBLE_PUSH:
                 doublePush = move;
@@ -90,7 +100,7 @@ public class MoveList {
         }
         
         for (Move element : elements) {
-            if (element.equals(Move.invalid())) {
+            if (element.isInvalid()) {
                 return false;
             }
             if (element.to() == pos) {

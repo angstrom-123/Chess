@@ -8,6 +8,13 @@ public class Rook extends Piece {
     public Rook(int pos, PieceColour col) {
         super(pos, col);
     }
+
+    @Override
+    public Piece copy() {
+        Rook out = new Rook(pos, col);
+        out.setMoved(this.hasMoved());
+        return out;
+    }
     
     @Override
     public MoveList getMoves(BoardRecord rec) {

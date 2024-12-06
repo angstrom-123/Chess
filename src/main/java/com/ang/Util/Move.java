@@ -20,6 +20,10 @@ public class Move {
                 && (from == move.from()) && (to == move.to()));
     }
 
+    public boolean isInvalid() {
+        return ((from == -1) && (to == -1));
+    }
+
     public Piece piece() {
         return piece;
     }

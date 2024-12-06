@@ -8,6 +8,13 @@ public class Bishop extends Piece {
     public Bishop(int pos, PieceColour col) {
         super(pos, col);
     }
+
+    @Override
+    public Piece copy() {
+        Bishop out = new Bishop(pos, col);
+        out.setMoved(this.hasMoved());
+        return out;
+    }
     
     @Override
     public MoveList getMoves(BoardRecord rec) {
