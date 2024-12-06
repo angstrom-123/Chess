@@ -1,32 +1,37 @@
 package com.ang;
 
 import com.ang.Graphics.Renderer;
+import com.ang.Opponent.Engine;
 import com.ang.Pieces.*;
 import com.ang.Util.BoardRecord;
 import com.ang.Util.FENReader;
+import com.ang.Util.Move;
 import com.ang.Util.MoveList;
 
 public class Game implements GameInterface {
     final static int SQUARE_SIZE = 45;
     final static double RENDER_SCALE = 1.2;
 
-    private int selectedSquare = -1;
+    private int selected = -1;
 
-    private BoardRecord currentBoard;
+    private BoardRecord realRec;
     private PieceColour colToMove = PieceColour.WHITE;
     private Renderer renderer;
+    private Engine engine;
 
     public void start() {
-        currentBoard = new BoardRecord();
+        realRec = new BoardRecord();
 
         Piece[] b = FENReader.readFEN("rnbqkbnrpppppppp8888PPPPPPPPRNBQKBNR");
-        currentBoard.board = b;
-        currentBoard.whiteKingPos = 60;
-        currentBoard.blackKingPos = 4;
-        currentBoard.epPawnPos = -1;
+        realRec.board = b;
+        realRec.whiteKingPos = 60;
+        realRec.blackKingPos = 4;
+        realRec.epPawnPos = -1;
 
         renderer = new Renderer(SQUARE_SIZE, RENDER_SCALE, this);
-        renderer.drawAllSprites(currentBoard);
+        renderer.drawAllSprites(realRec);
+
+        engine = new Engine(2);
     }
 
     public void mouseClick(int x, int y) {
@@ -41,33 +46,37 @@ public class Game implements GameInterface {
         boolean showMoves = false;
         renderer.drawBoard(); 
 
-        int pressedSquare = y * 8 + x;   
-        if (currentBoard.colourAt(pressedSquare) == colToMove) {
+        int pressed = y * 8 + x;   
+        if (realRec.colourAt(pressed) == colToMove) {
             renderer.highlightSquare(x, y);
-            selectedSquare = pressedSquare;
+            selected = pressed;
             showMoves = true;
-        } else if ((selectedSquare > -1) 
-                && (currentBoard.colourAt(pressedSquare) != colToMove)) {
-            boolean moved = currentBoard.tryMove(selectedSquare, pressedSquare);
+        } else if ((selected > -1) && (realRec.colourAt(pressed) != colToMove)) {
+            Move moveToMake = new Move(realRec.board[selected], 
+                    selected, pressed);
+            
+            boolean moved = realRec.tryMove(moveToMake);
             if (moved) {
                 colToMove = (colToMove == PieceColour.WHITE) 
                 ? PieceColour.BLACK 
                 : PieceColour.WHITE;
-                selectedSquare = -1;
+                selected = -1;
+
+                // engine.generateMove(realRec);
             }
         }
 
-        renderer.drawAllSprites(currentBoard);    
+        renderer.drawAllSprites(realRec);    
         if (showMoves) {
-            showMoves(selectedSquare);
+            showMoves(selected);
         }        
     }
 
     public void showMoves(int pos) {
-        MoveList moves = currentBoard.board[selectedSquare].getMoves(currentBoard);
+        MoveList moves = realRec.board[selected].getMoves(realRec);
         for (int i = 0; i < moves.length() - 1; i++) {
-            int markX = moves.at(i) % 8;
-            int markY = (int)Math.floor(moves.at(i) / 8);
+            int markX = moves.at(i).to() % 8;
+            int markY = (int)Math.floor(moves.at(i).to() / 8);
             renderer.drawMarker(markX, markY);
         }
     }

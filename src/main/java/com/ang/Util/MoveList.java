@@ -3,23 +3,21 @@ package com.ang.Util;
 public class MoveList {
     private int origin;
 
-    private int[] elements; // regular moves
-    private int doublePush = -1;
-    private int castleShort = -1;
-    private int castleLong = -1;
-    private int enPassant = -1;
-    private int promotion = -1;
+    private Move[] elements;
+    private Move doublePush = Move.invalid();
+    private Move castleShort = Move.invalid();
+    private Move castleLong = Move.invalid();
+    private Move enPassant = Move.invalid();
+    private Move promotion = Move.invalid();
 
     private int end = 0;
 
     public MoveList() {};
 
-    public MoveList(int maxElements, int origin) {
-        this.origin = origin;
-
-        elements = new int[maxElements];
+    public MoveList(int maxElements) {
+        elements = new Move[maxElements];
         for (int i = 0; i < maxElements; i++) {
-            elements[i] = -1;
+            elements[i] = Move.invalid();
         }
     }
 
@@ -33,35 +31,35 @@ public class MoveList {
         }
     }
 
-    public void add(int pos) {
-        elements[end] = pos;
+    public void add(Move move) {
+        elements[end] = move;
         end++;
     }
 
-    public void addSpec(int pos, SpecialMove spec) {
+    public void addSpec(Move move, SpecialMove spec) {
         switch (spec) {
             case DOUBLE_PUSH:
-                doublePush = pos;
+                doublePush = move;
                 break;
             case CASTLE_LONG:
-                castleLong = pos;
+                castleLong = move;
                 break;
             case CASTLE_SHORT:
-                castleShort = pos;
+                castleShort = move;
                 break;
             case EN_PASSANT:
-                enPassant = pos;
+                enPassant = move;
                 break;
             case PROMOTION:
-                promotion = pos;
+                promotion = move;
                 break;
             default:
                 break;
         }
-        add(pos);
+        add(move);
     }
 
-    public int getSpecialMove(SpecialMove move) {
+    public Move getSpecialMove(SpecialMove move) {
         switch (move) {
             case DOUBLE_PUSH:
                 return doublePush;
@@ -74,7 +72,7 @@ public class MoveList {
             case PROMOTION:
                 return promotion;
             default:
-                return -1;
+                return Move.invalid();
         }
     }
 
@@ -82,29 +80,29 @@ public class MoveList {
         return end + 1;
     }
 
-    public int at(int index) {
+    public Move at(int index) {
         return elements[index];
     }
 
-    public boolean contains(int val) {
+    public boolean contains(int pos) {
         if (end == 0) {
             return false;
         }
         
-        for (int element : elements) {
-            if (element == val) {
-                return true;
-            }
-            if (element == -1) {
+        for (Move element : elements) {
+            if (element.equals(Move.invalid())) {
                 return false;
+            }
+            if (element.to() == pos) {
+                return true;
             }
         }
         return false;
     }
 
-    public int indexOf(int val) {
+    public int indexOf(Move move) {
         for (int i = 0; i < length() - 1; i++) {
-            if (elements[i] == val) {
+            if (elements[i].equals(move)) {
                 return i;
             }
         }

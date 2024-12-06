@@ -24,7 +24,7 @@ public class Piece {
     }
 
     public MoveList getMoves(BoardRecord rec) {
-        return new MoveList(0, -1);
+        return new MoveList(0);
     }
 
     public boolean hasMoved() {

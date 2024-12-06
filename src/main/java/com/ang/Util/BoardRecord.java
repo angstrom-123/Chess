@@ -12,41 +12,39 @@ public class BoardRecord {
 
     public BoardRecord() {}
 
-    public BoardRecord copy(BoardRecord rec) {
+    public BoardRecord copy() {
         BoardRecord temp = new BoardRecord();
 
         temp.board = new Piece[64];
         for (int i = 0; i < temp.board.length; i++) {
-            temp.board[i] = rec.board[i];
+            temp.board[i] = this.board[i];
         }
-        temp.whiteKingPos = rec.whiteKingPos;
-        temp.blackKingPos = rec.blackKingPos;
-        temp.epPawnPos = rec.epPawnPos;
+        temp.whiteKingPos = this.whiteKingPos;
+        temp.blackKingPos = this.blackKingPos;
+        temp.epPawnPos = this.epPawnPos;
         
         return temp;
     }
 
-    public boolean tryMove(int from, int to) {
-        Piece movingPiece = board[from];
-        
-        MoveList legal = pieceMoves(from);
-        if (!legal.contains(to)) {
+    public boolean tryMove(Move move) {
+        MoveList legal = pieceMoves(move.from());
+        if (!legal.contains(move.to())) {
             return false;
         }
-
-        boolean dp = (legal.getSpecialMove(SpecialMove.DOUBLE_PUSH) == to);
-        boolean ep = (legal.getSpecialMove(SpecialMove.EN_PASSANT) == to);
+        
+        boolean dp = (legal.getSpecialMove(SpecialMove.DOUBLE_PUSH).equals(move));
+        boolean ep = (legal.getSpecialMove(SpecialMove.EN_PASSANT).equals(move));
         // TODO: implement castling, promotion
-        // boolean cl = (legal.getSpecialMove(SpecialMove.CASTLE_LONG) == to);
-        // boolean cs = (legal.getSpecialMove(SpecialMove.CASTLE_SHORT) == to);
-        // boolean pr = (legal.getSpecialMove(SpecialMove.PROMOTION) == to);
+        // boolean cl = (legal.getSpecialMove(SpecialMove.CASTLE_LONG).equals(move));
+        // boolean cs = (legal.getSpecialMove(SpecialMove.CASTLE_SHORT).equals(move));
+        // boolean pr = (legal.getSpecialMove(SpecialMove.PROMOTION).equals(move));
 
-        BoardRecord tempRec = copy(this);
-        tempRec.movePiece(from, to);
+        BoardRecord tempRec = this.copy();
+        tempRec.movePiece(move);
         for (int i = 0; i < tempRec.board.length; i++) {
-            if (tempRec.colourAt(i) == movingPiece.oppositeColour()) {
+            if (tempRec.colourAt(i) == move.piece().oppositeColour()) {
                 MoveList moves = tempRec.board[i].getMoves(tempRec);
-                int kingSquare = (movingPiece.colour() == PieceColour.WHITE)
+                int kingSquare = (move.piece().colour() == PieceColour.WHITE)
                 ? tempRec.whiteKingPos
                 : tempRec.blackKingPos;
 
@@ -56,32 +54,30 @@ public class BoardRecord {
             }
         }
 
-        movePiece(from, to);
-        board[to].setPos(to);
+        movePiece(move);
+        board[move.to()].setPos(move.to());
 
         if (ep) {
-            System.out.println("ep"); 
             board[epPawnPos] = new Piece(); 
         }
-        epPawnPos = (dp) ? to : -1;
-        board[to].setMoved(true); 
+        epPawnPos = (dp) ? move.to() : -1;
+        board[move.to()].setMoved(true); 
 
         return true;
     }
 
-    public void movePiece(int from, int to) {
-        Piece piece = board[from];
-        board[to] = piece;
-        board[from] = new Piece();
-        piece.setMoved(true);
+    public void movePiece(Move move) {
+        board[move.to()] = move.piece();
+        board[move.from()] = new Piece();
+        move.piece().setMoved(true);
 
-        if (piece.type() == PieceType.KING) {
-            switch (piece.colour()) {
+        if (move.piece().type() == PieceType.KING) {
+            switch (move.piece().colour()) {
                 case WHITE:
-                    whiteKingPos = to;
+                    whiteKingPos = move.to();
                     break;
                 case BLACK:
-                    blackKingPos = to;
+                    blackKingPos = move.to();
                     break;
                 default:
                     break;
@@ -93,18 +89,13 @@ public class BoardRecord {
         return board[index].getMoves(this);
     }
 
-    public MoveList[] possibleMoves(PieceColour col) {
-        MoveList[] moves = new MoveList[16];
-        int end = 0;
-        for (int i = 0; i < board.length; i++) {
-            if (colourAt(i) != col) {
-                continue;
-            }
 
-            MoveList pieceMoves = new MoveList(30, i);
-            pieceMoves.add(pieceMoves(i));
-            moves[end] = pieceMoves;
-            end++;
+    public MoveList possibleMoves(PieceColour col) {
+        MoveList moves = new MoveList(16 * 27);
+        for (int i = 0; i < board.length; i++) {
+            if (colourAt(i) == col) {
+                moves.add(pieceMoves(i));
+            }
         }
 
         return moves;

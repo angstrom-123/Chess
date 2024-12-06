@@ -1,6 +1,7 @@
 package com.ang.Pieces;
 
 import com.ang.Util.BoardRecord;
+import com.ang.Util.Move;
 import com.ang.Util.MoveList;
 
 public class Bishop extends Piece {
@@ -10,7 +11,7 @@ public class Bishop extends Piece {
     
     @Override
     public MoveList getMoves(BoardRecord rec) {
-        MoveList moves = new MoveList(30, pos);
+        MoveList moves = new MoveList(27);
 
         int[] offsets = new int[]{-9, -7, 7, 9};
         for (int direction : offsets) {
@@ -22,11 +23,11 @@ public class Bishop extends Piece {
                     break;
                 }
                 if (rec.colourAt(stepPos + direction) == this.oppositeColour()) {
-                    moves.add(stepPos + direction);
+                    moves.add(new Move(this, pos, stepPos + direction));
                     break;
                 }
                 
-                moves.add(stepPos + direction);
+                moves.add(new Move(this, pos, stepPos + direction));
                 stepPos += direction;
                 step++;
             }
