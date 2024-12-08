@@ -10,6 +10,10 @@ public class Piece {
 
     public Piece() {};
 
+    public int pos() {
+        return pos;
+    }
+
     public Piece(int pos, PieceColour col) {
         this.pos = pos;
         this.col = col;

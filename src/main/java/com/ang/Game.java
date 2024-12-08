@@ -19,6 +19,10 @@ public class Game implements GameInterface {
     private Renderer renderer;
     private Engine engine;
 
+    public Game(Engine engine) {
+        this.engine = engine;
+    }
+
     public void start() {
         realRec = new BoardRecord();
 
@@ -30,8 +34,6 @@ public class Game implements GameInterface {
 
         renderer = new Renderer(SQUARE_SIZE, RENDER_SCALE, this);
         renderer.drawAllSprites(realRec);
-
-        engine = new Engine(2);
     }
 
     public void mouseClick(int x, int y) {
@@ -57,14 +59,9 @@ public class Game implements GameInterface {
             
             boolean moved = realRec.tryMove(moveToMake);
             if (moved) {
-                // colToMove = (colToMove == PieceColour.WHITE) 
-                // ? PieceColour.BLACK 
-                // : PieceColour.WHITE;
-                selected = -1;
-
                 Move engineMove = engine.generateMove(realRec);
-                System.out.println("engine move "+engineMove.from()+" "+engineMove.to());
-                System.out.println(realRec.tryMove(engineMove));
+                realRec.tryMove(engineMove);
+                selected = -1;
             }
         }
 

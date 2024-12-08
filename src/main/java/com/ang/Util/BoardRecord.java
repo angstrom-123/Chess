@@ -17,7 +17,7 @@ public class BoardRecord {
 
         temp.board = new Piece[64];
         for (int i = 0; i < temp.board.length; i++) {
-            temp.board[i] = this.board[i];
+            temp.board[i] = this.board[i].copy();
         }
         temp.whiteKingPos = this.whiteKingPos;
         temp.blackKingPos = this.blackKingPos;
@@ -27,6 +27,10 @@ public class BoardRecord {
     }
 
     public boolean tryMove(Move move) {
+        if (move.isInvalid()) {
+            return false;
+        }
+
         MoveList legal = pieceMoves(move.from());
         if (!legal.contains(move.to())) {
             return false;
@@ -102,14 +106,14 @@ public class BoardRecord {
     }
 
     public PieceType pieceAt(int pos) {
-        if (board[pos] == new Piece()) {
+        if (((pos < 0) || (pos > 63) || board[pos] == new Piece())) {
             return PieceType.NONE;
         }
         return board[pos].type();
     }
 
     public PieceColour colourAt(int pos) {
-        if (board[pos] == new Piece()) {
+        if (((pos < 0) || (pos > 63) || board[pos] == new Piece())) {
             return PieceColour.NONE;
         }
         return board[pos].colour();

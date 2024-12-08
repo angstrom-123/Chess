@@ -30,11 +30,11 @@ public class Queen extends Piece {
                     break;
                 }
                 if (rec.colourAt(stepPos + direction) == this.oppositeColour()) {
-                    moves.add(new Move(this, pos, stepPos + direction));
+                    moves.add(new Move(this.copy(), pos, stepPos + direction));
                     break;
                 }
                 
-                moves.add(new Move(this, pos, stepPos + direction));
+                moves.add(new Move(this.copy(), pos, stepPos + direction));
                 stepPos += direction;
                 step++;
             }

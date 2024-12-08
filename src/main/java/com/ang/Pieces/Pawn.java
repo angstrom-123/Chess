@@ -36,9 +36,9 @@ public class Pawn extends Piece {
             // single push
             if (super.inBounds(pos, move)) { 
                 if ((pos < 8) || (pos >55)) {
-                    moves.addSpec(new Move(this, pos, pos + move), SpecialMove.PROMOTION);
+                    moves.addSpec(new Move(this.copy(), pos, pos + move), SpecialMove.PROMOTION);
                 }
-                moves.add(new Move(this, pos, pos + move)); 
+                moves.add(new Move(this.copy(), pos, pos + move)); 
             }
 
             if (!hasMoved()) {
@@ -46,7 +46,7 @@ public class Pawn extends Piece {
                 if (rec.pieceAt(pos + move) == PieceType.NONE) {
                     // double push
                     if (super.inBounds(pos, move)) { 
-                        moves.addSpec(new Move(this, pos, pos + move), SpecialMove.DOUBLE_PUSH); 
+                        moves.addSpec(new Move(this.copy(), pos, pos + move), SpecialMove.DOUBLE_PUSH); 
                     }
                 }
             }
@@ -57,13 +57,13 @@ public class Pawn extends Piece {
         if (rec.colourAt(pos + move) == opCol) {
             // take left
             if (super.inBounds(pos, move)) { 
-                moves.add(new Move(this, pos, pos + move)); 
+                moves.add(new Move(this.copy(), pos, pos + move)); 
             }
         } else if (rec.pieceAt(pos + move) == PieceType.NONE) {
             if (rec.epPawnPos == pos -1) {
                 // en passant left
                 if (super.inBounds(pos, move)) { 
-                    moves.addSpec(new Move(this, pos, pos + move), SpecialMove.EN_PASSANT); 
+                    moves.addSpec(new Move(this.copy(), pos, pos + move), SpecialMove.EN_PASSANT); 
                 }
             }
         }
@@ -72,13 +72,13 @@ public class Pawn extends Piece {
         if (rec.colourAt(pos + move) == opCol) { 
             // take right
             if (super.inBounds(pos, move)) { 
-                moves.add(new Move(this, pos, pos + move)); 
+                moves.add(new Move(this.copy(), pos, pos + move)); 
             }
         } else {
             if (rec.epPawnPos == pos + 1) {
                 // en passant right
                 if (super.inBounds(pos, move)) { 
-                    moves.addSpec(new Move(this, pos, pos + move), SpecialMove.EN_PASSANT); 
+                    moves.addSpec(new Move(this.copy(), pos, pos + move), SpecialMove.EN_PASSANT); 
                 }
             }
         }

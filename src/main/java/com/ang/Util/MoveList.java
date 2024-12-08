@@ -91,6 +91,9 @@ public class MoveList {
     }
 
     public Move at(int index) {
+        if (end == 0) {
+            return Move.invalid();
+        }
         return elements[index];
     }
 

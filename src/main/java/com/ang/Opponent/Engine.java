@@ -14,38 +14,55 @@ public class Engine {
         this.maxDepth = maxDepth;
     }
 
-    // make a move then:
-    //     for all moves in the position
-    //          make the move
-    //          call recurse on this new rec with opposite colour
-    //          until depth limit
-    //          then record eval at final position
-    //          (return eval at depth limit)
-    //     if move's eval is better than best eval then record the move and eval
-    
     public Move generateMove(BoardRecord rec) {
         Move bestMove = Move.invalid();
-        double bestEval = Global.infinity;
+        PieceColour moveCol = PieceColour.BLACK;
 
-        MoveList possibleMoves = rec.possibleMoves(PieceColour.BLACK);
+        double bestEval = -Global.infinity;
+
+        MoveList possibleMoves = rec.possibleMoves(moveCol);
         for (int i = 0; i < possibleMoves.length() - 1; i++) {
             BoardRecord tempRec = rec.copy();
-            Piece testPiece = possibleMoves.at(i).piece().copy();
-            System.out.println(possibleMoves.at(i).from()+" "+possibleMoves.at(i).to());
-            if (tempRec.tryMove(possibleMoves.at(i))) {
-                double eval = recurse(tempRec, PieceColour.WHITE, maxDepth, Global.infinity);
-                if ((eval < bestEval) || (bestMove.isInvalid())) {
+            Move tempMove = possibleMoves.at(i);
+            
+            if (tempRec.tryMove(tempMove)) {
+                double eval = -negaMax(tempRec, PieceColour.opposite(moveCol), maxDepth);
+
+                if (eval > bestEval) {
                     bestEval = eval;
-                    bestMove = new Move(testPiece, possibleMoves.at(i).from(), possibleMoves.at(i).to());
+                    bestMove = tempMove;
                 }
             }
         }
 
+        // TODO: implement checkmate
+        if (bestMove.isInvalid()) {
+            System.out.println("couldn't find move");
+        }
         return bestMove;
     }
 
-    public double recurse(BoardRecord rec, PieceColour col, int depth, double currentEval) {
-        return evaluate(rec);
+    public double negaMax(BoardRecord rec, PieceColour col, int depth) {
+        if (depth == 0) {
+            double eval = evaluate(rec);
+            return eval;
+        }
+
+        double max = -Global.infinity;
+        MoveList possibleMoves = rec.possibleMoves(col);
+        for (int i = 0; i < possibleMoves.length() - 1; i++) {
+            BoardRecord tempRec = rec.copy();
+            Move tempMove = possibleMoves.at(i);
+    
+            if (tempRec.tryMove(tempMove)) {
+                double eval = negaMax(tempRec, PieceColour.opposite(col), depth - 1);
+                if (eval > max) {
+                    max = eval;
+                }
+            }
+        }
+
+        return max;
     }
 
     private double evaluate(BoardRecord rec) {
@@ -66,4 +83,63 @@ public class Engine {
 
         return eval;
     }
+
+    // for debugging
+    // private void displayBoard(BoardRecord rec) {
+    //     for (int i = 0; i < rec.board.length; i++) {
+    //         if (i % 8 == 0) {
+    //             System.out.println();
+    //         }
+    //         switch (rec.pieceAt(i)) {
+    //             case PAWN:
+    //                 if (rec.colourAt(i) == PieceColour.WHITE) {
+    //                     System.out.print('P');
+    //                 } else {
+    //                     System.out.print('p');
+    //                 }
+    //                 break;
+    //             case KNIGHT:
+    //                 if (rec.colourAt(i) == PieceColour.WHITE) {
+    //                     System.out.print('N');
+    //                 } else {
+    //                     System.out.print('n');
+    //                 }
+    //                 break;
+    //             case BISHOP:
+    //                 if (rec.colourAt(i) == PieceColour.WHITE) {
+    //                     System.out.print('B');
+    //                 } else {
+    //                     System.out.print('b');
+    //                 }
+    //                 break;
+    //             case ROOK:
+    //                 if (rec.colourAt(i) == PieceColour.WHITE) {
+    //                     System.out.print('R');
+    //                 } else {
+    //                     System.out.print('r');
+    //                 }
+    //                 break;
+    //             case QUEEN:
+    //                 if (rec.colourAt(i) == PieceColour.WHITE) {
+    //                     System.out.print('Q');
+    //                 } else {
+    //                     System.out.print('q');
+    //                 }
+    //                 break;
+    //             case KING:
+    //                 if (rec.colourAt(i) == PieceColour.WHITE) {
+    //                     System.out.print('K');
+    //                 } else {
+    //                     System.out.print('k');
+    //                 }
+    //                 break;
+    //             default:
+    //                 System.out.print(' ');
+    //                 break;
+
+    //         }
+    //     }
+    //     System.out.println();
+    //     System.out.println("----------");
+    // }
 }

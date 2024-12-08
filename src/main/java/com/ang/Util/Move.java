@@ -16,12 +16,14 @@ public class Move {
     }
 
     public boolean equals(Move move) {
-        return ((piece == move.piece()) 
-                && (from == move.from()) && (to == move.to()));
+        return ((piece.type() == move.piece.type()) 
+                && (piece.colour() == move.piece.colour()) 
+                && (from == move.from()) 
+                && (to == move.to()));
     }
 
     public boolean isInvalid() {
-        return ((from == -1) && (to == -1));
+        return ((from == -1) || (to == -1));
     }
 
     public Piece piece() {

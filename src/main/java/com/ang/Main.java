@@ -1,8 +1,11 @@
 package com.ang;
 
+import com.ang.Opponent.Engine;
+
 public class Main {
     public static void main(String[] args) {
-        Game game = new Game();
+        Engine opponent = new Engine(2);
+        Game game = new Game(opponent);
         game.start();
     }
 }

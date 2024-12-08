@@ -24,7 +24,7 @@ public class King extends Piece {
         for (int move : offsets) {
             if ((super.inBounds(pos, move)) 
                     && (rec.colourAt(pos + move) != col)){
-                moves.add(new Move(this, pos, pos + move));
+                moves.add(new Move(this.copy(), pos, pos + move));
             }
         }
         
