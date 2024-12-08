@@ -257,6 +257,5 @@ public class Renderer extends JFrame {
 
         frame.repaint();
     }
-
 }
    

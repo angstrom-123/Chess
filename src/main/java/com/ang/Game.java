@@ -45,32 +45,34 @@ public class Game implements GameInterface {
     }
 
     public void squarePressed(int x, int y) {
-        boolean showMoves = false;
-        renderer.drawBoard(); 
-
         int pressed = y * 8 + x;   
         if (realRec.colourAt(pressed) == colToMove) {
             renderer.highlightSquare(x, y);
             selected = pressed;
-            showMoves = true;
+            refreshBoard(realRec);  
+            showMoves(selected);
         } else if ((selected > -1) && (realRec.colourAt(pressed) != colToMove)) {
             Move moveToMake = new Move(realRec.board[selected], 
                     selected, pressed);
             
             boolean moved = realRec.tryMove(moveToMake);
+
             if (moved) {
+                refreshBoard(realRec);
                 Move engineMove = engine.generateMove(realRec);
                 realRec.tryMove(engineMove);
                 selected = -1;
+                refreshBoard(realRec);
             }
-        }
-
-        renderer.drawAllSprites(realRec);    
-        if (showMoves) {
-            showMoves(selected);
-        }        
+        }     
     }
 
+    public void refreshBoard(BoardRecord rec) {
+        renderer.drawBoard();
+        renderer.drawAllSprites(rec);
+    }
+
+    // TODO : only show possible moves
     public void showMoves(int pos) {
         MoveList moves = realRec.board[selected].getMoves(realRec);
         for (int i = 0; i < moves.length() - 1; i++) {
