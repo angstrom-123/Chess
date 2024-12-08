@@ -9,6 +9,7 @@ import com.ang.Util.MoveList;
 
 public class Engine {   
     private int maxDepth;
+    private boolean isEndgame = false;
 
     public Engine(int maxDepth) {
         this.maxDepth = maxDepth;
@@ -65,81 +66,57 @@ public class Engine {
         return max;
     }
 
+    private double pieceValue(BoardRecord rec, int index) {
+        double value = 0.0;
+        int heatmapIndex = (rec.colourAt(index) == PieceColour.WHITE)
+        ? index
+        : 63 - index;
+
+        switch (rec.pieceAt(index)) {
+            case PieceType.PAWN:
+                value = 100.0 + Heatmap.pawnMap[heatmapIndex];
+                break;
+            case PieceType.KNIGHT:
+                value = 320.0 + Heatmap.pawnMap[heatmapIndex];
+                break;
+            case PieceType.BISHOP:
+                value = 330.0 + Heatmap.pawnMap[heatmapIndex];
+                break;
+            case PieceType.ROOK:
+                value = 500.0 + Heatmap.pawnMap[heatmapIndex];
+                break;
+            case PieceType.QUEEN:
+                value = 900.0 + Heatmap.pawnMap[heatmapIndex];
+                break;
+            case PieceType.KING:
+                double[] heatmap = isEndgame 
+                ? Heatmap.kingEndMap
+                : Heatmap.kingStartMap;
+                value = 20000.0 + heatmap[heatmapIndex];
+                break;
+            default:
+                value = 0.0;
+        }
+
+        return (rec.colourAt(index) == PieceColour.WHITE) ? value : -value;
+    }
+
     private double evaluate(BoardRecord rec) {
         double eval = 0.0;
 
+        int minorPieceCount = 0;
         for (int i = 0; i < rec.board.length; i++) {
-            switch (rec.colourAt(i)) {
-                case WHITE:
-                    eval += rec.pieceAt(i).value();
-                    break;
-                case BLACK:
-                    eval -= rec.pieceAt(i).value();
-                    break;
-                default:
-                    break;
+            eval += pieceValue(rec, i);
+            PieceType p = rec.pieceAt(i);
+            if ((p == PieceType.KNIGHT) || (p == PieceType.BISHOP)) {
+                minorPieceCount++;
             }
+        }
+
+        if (minorPieceCount < 2) {
+            isEndgame = true;
         }
 
         return eval;
     }
-
-    // for debugging
-    // private void displayBoard(BoardRecord rec) {
-    //     for (int i = 0; i < rec.board.length; i++) {
-    //         if (i % 8 == 0) {
-    //             System.out.println();
-    //         }
-    //         switch (rec.pieceAt(i)) {
-    //             case PAWN:
-    //                 if (rec.colourAt(i) == PieceColour.WHITE) {
-    //                     System.out.print('P');
-    //                 } else {
-    //                     System.out.print('p');
-    //                 }
-    //                 break;
-    //             case KNIGHT:
-    //                 if (rec.colourAt(i) == PieceColour.WHITE) {
-    //                     System.out.print('N');
-    //                 } else {
-    //                     System.out.print('n');
-    //                 }
-    //                 break;
-    //             case BISHOP:
-    //                 if (rec.colourAt(i) == PieceColour.WHITE) {
-    //                     System.out.print('B');
-    //                 } else {
-    //                     System.out.print('b');
-    //                 }
-    //                 break;
-    //             case ROOK:
-    //                 if (rec.colourAt(i) == PieceColour.WHITE) {
-    //                     System.out.print('R');
-    //                 } else {
-    //                     System.out.print('r');
-    //                 }
-    //                 break;
-    //             case QUEEN:
-    //                 if (rec.colourAt(i) == PieceColour.WHITE) {
-    //                     System.out.print('Q');
-    //                 } else {
-    //                     System.out.print('q');
-    //                 }
-    //                 break;
-    //             case KING:
-    //                 if (rec.colourAt(i) == PieceColour.WHITE) {
-    //                     System.out.print('K');
-    //                 } else {
-    //                     System.out.print('k');
-    //                 }
-    //                 break;
-    //             default:
-    //                 System.out.print(' ');
-    //                 break;
-
-    //         }
-    //     }
-    //     System.out.println();
-    //     System.out.println("----------");
-    // }
 }
