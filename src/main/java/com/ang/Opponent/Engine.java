@@ -14,11 +14,11 @@ import com.ang.Util.MoveList;
 //      - killer moves
 //      - quiescent search
 //      - pawn position evaluation
-//      - negascout
 
-public class Engine {   
+public class Engine {  
     private int maxDepth;
-    private boolean isEndgame = false;
+    private double endgameWeight = 1.0;
+    private double endgameThreshold = 3.0;
 
     public Engine(int maxDepth) {
         this.maxDepth = maxDepth;
@@ -31,6 +31,7 @@ public class Engine {
         double bestEval = -Global.infinity;
 
         MoveList possibleMoves = rec.possibleMoves(moveCol);
+
         for (int i = 0; i < possibleMoves.length() - 1; i++) {
             BoardRecord tempRec = rec.copy();
             Move tempMove = possibleMoves.at(i);
@@ -121,7 +122,7 @@ public class Engine {
                 value = 900.0 + Heatmap.pawnMap[heatmapIndex];
                 break;
             case PieceType.KING:
-                double[] heatmap = isEndgame 
+                double[] heatmap = (endgameWeight >= endgameThreshold)
                 ? Heatmap.kingEndMap
                 : Heatmap.kingStartMap;
                 value = 20000.0 + heatmap[heatmapIndex];
@@ -136,17 +137,8 @@ public class Engine {
     private double evaluate(BoardRecord rec) {
         double eval = 0.0;
 
-        int minorPieceCount = 0;
         for (int i = 0; i < rec.board.length; i++) {
             eval += pieceValue(rec, i);
-            PieceType p = rec.pieceAt(i);
-            if ((p == PieceType.KNIGHT) || (p == PieceType.BISHOP)) {
-                minorPieceCount++;
-            }
-        }
-
-        if (minorPieceCount < 2) {
-            isEndgame = true;
         }
 
         return eval;

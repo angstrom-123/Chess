@@ -9,16 +9,42 @@ public class BoardRecord {
     public int whiteKingPos;
     public int blackKingPos;
     public int epPawnPos;
+    public int[] piecePosArr;
+
+    private int piecePosEnd;
 
     public BoardRecord() {}
+
+    public void prefetchPiecePositions() {
+        if (board == null) {
+            return;
+        }
+
+        piecePosArr = new int[32];
+        piecePosEnd = 0;
+        for (int i = 0; i < board.length; i++) {
+            if (i < 32) {
+                piecePosArr[i] = -1;
+            }
+            if (board[i].type() != PieceType.NONE) {
+                piecePosArr[piecePosEnd] = i;
+                piecePosEnd++;
+            }
+        }
+    }
 
     public BoardRecord copy() {
         BoardRecord temp = new BoardRecord();
 
         temp.board = new Piece[64];
-        for (int i = 0; i < temp.board.length; i++) {
+        for (int i = 0; i < this.board.length; i++) {
             temp.board[i] = this.board[i].copy();
         }
+        temp.piecePosArr = new int[32];
+        for (int i = 0; i < this.piecePosArr.length; i++) {
+            temp.piecePosArr[i] = this.piecePosArr[i];
+        }
+        temp.piecePosEnd = this.piecePosEnd;
         temp.whiteKingPos = this.whiteKingPos;
         temp.blackKingPos = this.blackKingPos;
         temp.epPawnPos = this.epPawnPos;
@@ -45,9 +71,14 @@ public class BoardRecord {
 
         BoardRecord tempRec = this.copy();
         tempRec.movePiece(move);
-        for (int i = 0; i < tempRec.board.length; i++) {
-            if (tempRec.colourAt(i) == move.piece().oppositeColour()) {
-                MoveList moves = tempRec.board[i].getMoves(tempRec);
+
+        for (int i = 0; i < piecePosArr.length; i++) {
+            int pos = piecePosArr[i];
+            if (pos == -1) {
+                break;
+            }
+            if (tempRec.colourAt(pos) == move.piece().oppositeColour()) {
+                MoveList moves = tempRec.board[pos].getMoves(tempRec);
                 int kingSquare = (move.piece().colour() == PieceColour.WHITE)
                 ? tempRec.whiteKingPos
                 : tempRec.blackKingPos;
@@ -75,6 +106,29 @@ public class BoardRecord {
         board[move.from()] = new Piece();
         move.piece().setMoved(true);
 
+        int startIndex = -1;
+        int endIndex = -1;
+        for (int i = 0; i < piecePosArr.length; i++) {
+            if (piecePosArr[i] == -1) {
+                break;
+            }
+            if (piecePosArr[i] == move.from()) {
+                startIndex = i;
+            }
+            if (piecePosArr[i] == move.to()) {
+                endIndex = i;
+            }
+        }
+
+        if (endIndex == -1) {
+            piecePosArr[startIndex] = move.to();
+        } else {
+            piecePosArr[endIndex] = move.to();
+            piecePosArr[startIndex] = piecePosArr[piecePosEnd - 1];
+            piecePosArr[piecePosEnd - 1] = -1;
+            piecePosEnd--;
+        }
+
         if (move.piece().type() == PieceType.KING) {
             switch (move.piece().colour()) {
                 case WHITE:
@@ -96,9 +150,13 @@ public class BoardRecord {
 
     public MoveList possibleMoves(PieceColour col) {
         MoveList moves = new MoveList(16 * 27);
-        for (int i = 0; i < board.length; i++) {
-            if (colourAt(i) == col) {
-                moves.add(pieceMoves(i));
+        for (int i = 0; i < piecePosArr.length; i++) {
+            int pos = piecePosArr[i];
+            if (pos == -1) {
+                break;
+            }
+            if (colourAt(pos) == col) {
+                moves.add(pieceMoves(pos));
             }
         }
 

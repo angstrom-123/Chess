@@ -14,7 +14,7 @@ public class Game implements GameInterface {
 
     private int selected = -1;
 
-    private BoardRecord realRec;
+    private BoardRecord gameRec;
     private PieceColour colToMove = PieceColour.WHITE;
     private Renderer renderer;
     private Engine engine;
@@ -24,16 +24,17 @@ public class Game implements GameInterface {
     }
 
     public void start() {
-        realRec = new BoardRecord();
+        gameRec = new BoardRecord();
 
         Piece[] b = FENReader.readFEN("rnbqkbnrpppppppp8888PPPPPPPPRNBQKBNR");
-        realRec.board = b;
-        realRec.whiteKingPos = 60;
-        realRec.blackKingPos = 4;
-        realRec.epPawnPos = -1;
+        gameRec.board = b;
+        gameRec.whiteKingPos = 60;
+        gameRec.blackKingPos = 4;
+        gameRec.epPawnPos = -1;
+        gameRec.prefetchPiecePositions();
 
         renderer = new Renderer(SQUARE_SIZE, RENDER_SCALE, this);
-        renderer.drawAllSprites(realRec);
+        renderer.drawAllSprites(gameRec);
     }
 
     public void mouseClick(int x, int y) {
@@ -46,23 +47,23 @@ public class Game implements GameInterface {
 
     public void squarePressed(int x, int y) {
         int pressed = y * 8 + x;   
-        if (realRec.colourAt(pressed) == colToMove) {
+        if (gameRec.colourAt(pressed) == colToMove) {
             renderer.highlightSquare(x, y);
             selected = pressed;
-            refreshBoard(realRec);  
+            refreshBoard(gameRec);  
             showMoves(selected);
-        } else if ((selected > -1) && (realRec.colourAt(pressed) != colToMove)) {
-            Move moveToMake = new Move(realRec.board[selected], 
+        } else if ((selected > -1) && (gameRec.colourAt(pressed) != colToMove)) {
+            Move moveToMake = new Move(gameRec.board[selected], 
                     selected, pressed);
             
-            boolean moved = realRec.tryMove(moveToMake);
+            boolean moved = gameRec.tryMove(moveToMake);
 
             if (moved) {
-                refreshBoard(realRec);
-                Move engineMove = engine.generateMove(realRec);
-                realRec.tryMove(engineMove);
+                refreshBoard(gameRec);
+                Move engineMove = engine.generateMove(gameRec);
+                gameRec.tryMove(engineMove);
                 selected = -1;
-                refreshBoard(realRec);
+                refreshBoard(gameRec);
             }
         }     
     }
@@ -74,7 +75,7 @@ public class Game implements GameInterface {
 
     // TODO : only show possible moves
     public void showMoves(int pos) {
-        MoveList moves = realRec.board[selected].getMoves(realRec);
+        MoveList moves = gameRec.board[selected].getMoves(gameRec);
         for (int i = 0; i < moves.length() - 1; i++) {
             int markX = moves.at(i).to() % 8;
             int markY = (int)Math.floor(moves.at(i).to() / 8);
