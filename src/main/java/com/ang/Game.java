@@ -49,9 +49,10 @@ public class Game implements GameInterface {
     public void squarePressed(int x, int y) {
         int pressed = y * 8 + x;   
         if (gameRec.colourAt(pressed) == colToMove) {
-            renderer.highlightSquare(x, y);
             selected = pressed;
-            refreshBoard(gameRec);  
+            renderer.drawBoard();
+            renderer.highlightSquare(x, y);
+            renderer.drawAllSprites(gameRec);
             showMoves(selected);
         } else if ((selected > -1) && (gameRec.colourAt(pressed) != colToMove)) {
             Move moveToMake = new Move(gameRec.board[selected], 

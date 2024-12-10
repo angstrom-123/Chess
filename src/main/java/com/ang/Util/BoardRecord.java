@@ -67,8 +67,8 @@ public class BoardRecord {
         boolean dp = (legal.getSpecialMove(SpecialMove.DOUBLE_PUSH).equals(move));
         boolean ep = (legal.getSpecialMove(SpecialMove.EN_PASSANT).equals(move));
         // TODO: implement castling, promotion
-        // boolean cl = (legal.getSpecialMove(SpecialMove.CASTLE_LONG).equals(move));
-        // boolean cs = (legal.getSpecialMove(SpecialMove.CASTLE_SHORT).equals(move));
+        boolean cl = (legal.getSpecialMove(SpecialMove.CASTLE_LONG).equals(move));
+        boolean cs = (legal.getSpecialMove(SpecialMove.CASTLE_SHORT).equals(move));
         // boolean pr = (legal.getSpecialMove(SpecialMove.PROMOTION).equals(move));
 
         BoardRecord tempRec = this.copy();
@@ -97,8 +97,16 @@ public class BoardRecord {
         if (ep) {
             board[epPawnPos] = new Piece(); 
         }
+        if (cs) {
+            int rookPos = move.from() + 3;
+            movePiece(new Move(board[rookPos], rookPos, rookPos - 2));
+        }
+        if (cl) {
+            int rookPos = move.from() - 4;
+            movePiece(new Move(board[rookPos], rookPos, rookPos + 3));
+        }
+
         epPawnPos = (dp) ? move.to() : -1;
-        board[move.to()].setMoved(true); 
 
         return true;
     }
@@ -110,8 +118,11 @@ public class BoardRecord {
         }
 
         board[move.to()] = move.piece();
+        board[move.to()].setMoved(true);
+        board[move.to()].setPos(move.to());
         board[move.from()] = new Piece();
-        move.piece().setMoved(true);
+        // move.piece().setMoved(true);
+        // move.piece().setPos(move.to());
 
         int startIndex = -1;
         int endIndex = -1;
