@@ -1,9 +1,8 @@
 package com.ang.Util;
 
-public enum SpecialMove {
+public enum SpecMove {
     CASTLE_LONG,
     CASTLE_SHORT,
     DOUBLE_PUSH,
-    EN_PASSANT,
-    PROMOTION
+    EN_PASSANT
 }

@@ -8,7 +8,6 @@ public class MoveList {
     private Move castleShort = Move.invalid();
     private Move castleLong = Move.invalid();
     private Move enPassant = Move.invalid();
-    private Move promotion = Move.invalid();
 
     private int end = 0;
 
@@ -43,7 +42,7 @@ public class MoveList {
         end++;
     }
 
-    public void addSpec(Move move, SpecialMove spec) {
+    public void addSpec(Move move, SpecMove spec) {
         if (move.equals(Move.invalid())) {
             return;
         }
@@ -60,16 +59,13 @@ public class MoveList {
             case EN_PASSANT:
                 enPassant = move;
                 break;
-            case PROMOTION:
-                promotion = move;
-                break;
             default:
                 break;
         }
         add(move);
     }
 
-    public Move getSpecialMove(SpecialMove move) {
+    public Move getSpecMove(SpecMove move) {
         switch (move) {
             case DOUBLE_PUSH:
                 return doublePush;
@@ -79,8 +75,6 @@ public class MoveList {
                 return castleShort;
             case EN_PASSANT:
                 return enPassant;
-            case PROMOTION:
-                return promotion;
             default:
                 return Move.invalid();
         }

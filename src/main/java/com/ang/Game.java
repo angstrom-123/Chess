@@ -54,13 +54,14 @@ public class Game implements GameInterface {
             renderer.highlightSquare(x, y);
             renderer.drawAllSprites(gameRec);
             showMoves(selected);
-        } else if ((selected > -1) && (gameRec.colourAt(pressed) != colToMove)) {
+        } else if ((gameRec.colourAt(pressed) != colToMove)
+                && (selected > -1)) {
             Move moveToMake = new Move(gameRec.board[selected], 
                     selected, pressed);
-            
             boolean moved = gameRec.tryMove(moveToMake);
-
             if (moved) {
+                // will not refresh here as EDT will not exec it until after 
+                // the engine makes a move
                 refreshBoard(gameRec);
                 Move engineMove = engine.generateMove(gameRec);
                 gameRec.tryMove(engineMove);

@@ -45,11 +45,11 @@ public class BoardRecord {
         for (int i = 0; i < this.piecePosArr.length; i++) {
             temp.piecePosArr[i] = this.piecePosArr[i];
         }
-        temp.piecePosEnd = this.piecePosEnd;
         temp.whiteKingPos = this.whiteKingPos;
         temp.blackKingPos = this.blackKingPos;
         temp.epPawnPos = this.epPawnPos;
         temp.minorPieceCount = this.minorPieceCount;
+        temp.piecePosEnd = this.piecePosEnd;
         
         return temp;
     }
@@ -64,15 +64,8 @@ public class BoardRecord {
             return false;
         }
         
-        boolean dp = (legal.getSpecialMove(SpecialMove.DOUBLE_PUSH).equals(move));
-        boolean ep = (legal.getSpecialMove(SpecialMove.EN_PASSANT).equals(move));
-        // TODO: implement promotion
-        boolean cl = (legal.getSpecialMove(SpecialMove.CASTLE_LONG).equals(move));
-        boolean cs = (legal.getSpecialMove(SpecialMove.CASTLE_SHORT).equals(move));
-        // boolean pr = (legal.getSpecialMove(SpecialMove.PROMOTION).equals(move));
-
         BoardRecord tempRec = this.copy();
-        tempRec.movePiece(move);
+        tempRec.movePiece(move, legal);
 
         for (int i = 0; i < piecePosArr.length; i++) {
             int pos = piecePosArr[i];
@@ -91,27 +84,12 @@ public class BoardRecord {
             }
         }
 
-        movePiece(move);
-        board[move.to()].setPos(move.to());
-
-        if (ep) {
-            board[epPawnPos] = new Piece(); 
-        }
-        if (cs) {
-            int rookPos = move.from() + 3;
-            movePiece(new Move(board[rookPos], rookPos, rookPos - 2));
-        }
-        if (cl) {
-            int rookPos = move.from() - 4;
-            movePiece(new Move(board[rookPos], rookPos, rookPos + 3));
-        }
-
-        epPawnPos = (dp) ? move.to() : -1;
+        movePiece(move, legal);
 
         return true;
     }
 
-    public void movePiece(Move move) {
+    public void movePiece(Move move, MoveList legalMoves) {
         PieceType taken = board[move.to()].type();
         if ((taken == PieceType.KNIGHT) || (taken == PieceType.BISHOP)) {
             minorPieceCount--;
@@ -121,8 +99,54 @@ public class BoardRecord {
         board[move.to()].setMoved(true);
         board[move.to()].setPos(move.to());
         board[move.from()] = new Piece();
-        // move.piece().setMoved(true);
-        // move.piece().setPos(move.to());
+
+        if (legalMoves.getSpecMove(SpecMove.EN_PASSANT).equals(move)) {
+            board[epPawnPos] = new Piece(); 
+        }
+        if (legalMoves.getSpecMove(SpecMove.CASTLE_SHORT).equals(move)) {
+            int rookPos = move.from() + 3;
+            board[rookPos] = new Piece();
+            board[rookPos - 2] = new Rook(rookPos - 2, move.piece().colour());
+            board[rookPos - 2].setMoved(true);
+            for (int i = 0; i < piecePosEnd; i++) {
+                if (piecePosArr[i] == rookPos) {
+                    piecePosArr[i] = rookPos - 2;
+                }
+            }
+        }
+        if (legalMoves.getSpecMove(SpecMove.CASTLE_LONG).equals(move)) {
+            int rookPos = move.from() - 4;
+            board[rookPos] = new Piece();
+            board[rookPos + 3] = new Rook(rookPos + 3, move.piece().colour());
+            board[rookPos + 3].setMoved(true);
+            for (int i = 0; i < piecePosEnd; i++) {
+                if (piecePosArr[i] == rookPos) {
+                    piecePosArr[i] = rookPos + 3;
+                }
+            }
+        }
+        if ((move.piece().type() == PieceType.PAWN) // promotion
+                && ((move.to() < 8) || (move.to() > 55))) {
+            board[move.to()] = new Queen(move.to(), move.piece().colour());
+            board[move.to()].setMoved(true);
+        }
+
+        epPawnPos = (legalMoves.getSpecMove(SpecMove.DOUBLE_PUSH).equals(move)) 
+        ? move.to() 
+        : -1;
+
+        if (move.piece().type() == PieceType.KING) {
+            switch (move.piece().colour()) {
+                case WHITE:
+                    whiteKingPos = move.to();
+                    break;
+                case BLACK:
+                    blackKingPos = move.to();
+                    break;
+                default:
+                    break;
+            }
+        }
 
         int startIndex = -1;
         int endIndex = -1;
@@ -145,19 +169,6 @@ public class BoardRecord {
             piecePosArr[startIndex] = piecePosArr[piecePosEnd - 1];
             piecePosArr[piecePosEnd - 1] = -1;
             piecePosEnd--;
-        }
-
-        if (move.piece().type() == PieceType.KING) {
-            switch (move.piece().colour()) {
-                case WHITE:
-                    whiteKingPos = move.to();
-                    break;
-                case BLACK:
-                    blackKingPos = move.to();
-                    break;
-                default:
-                    break;
-            }
         }
     }
 

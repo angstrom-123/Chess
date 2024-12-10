@@ -3,7 +3,7 @@ package com.ang.Pieces;
 import com.ang.Util.BoardRecord;
 import com.ang.Util.Move;
 import com.ang.Util.MoveList;
-import com.ang.Util.SpecialMove;
+import com.ang.Util.SpecMove;
 
 public class King extends Piece {
     public King(int pos, PieceColour col) {
@@ -46,7 +46,7 @@ public class King extends Piece {
             int rookIndex = (col == PieceColour.WHITE) ? 63 : 7;
             if (!rec.board[rookIndex].hasMoved()) {
                 moves.addSpec(new Move(this.copy(), pos, pos + 2), 
-                        SpecialMove.CASTLE_SHORT);
+                        SpecMove.CASTLE_SHORT);
             }
         }
 
@@ -63,7 +63,7 @@ public class King extends Piece {
             int rookIndex = (col == PieceColour.WHITE) ? 56 : 0;
             if (!rec.board[rookIndex].hasMoved()) {
                 moves.addSpec(new Move(this.copy(), pos, pos - 2), 
-                        SpecialMove.CASTLE_LONG);
+                        SpecMove.CASTLE_LONG);
             }
         }
         

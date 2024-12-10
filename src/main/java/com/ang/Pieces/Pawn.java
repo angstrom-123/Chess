@@ -3,7 +3,7 @@ package com.ang.Pieces;
 import com.ang.Util.BoardRecord;
 import com.ang.Util.Move;
 import com.ang.Util.MoveList;
-import com.ang.Util.SpecialMove;
+import com.ang.Util.SpecMove;
 
 public class Pawn extends Piece {
     private int dir;
@@ -35,9 +35,6 @@ public class Pawn extends Piece {
         if (rec.pieceAt(pos + move) == PieceType.NONE) {
             // single push
             if (super.inBounds(pos, move)) { 
-                if ((pos < 8) || (pos >55)) {
-                    moves.addSpec(new Move(this.copy(), pos, pos + move), SpecialMove.PROMOTION);
-                }
                 moves.add(new Move(this.copy(), pos, pos + move)); 
             }
 
@@ -46,7 +43,7 @@ public class Pawn extends Piece {
                 if (rec.pieceAt(pos + move) == PieceType.NONE) {
                     // double push
                     if (super.inBounds(pos, move)) { 
-                        moves.addSpec(new Move(this.copy(), pos, pos + move), SpecialMove.DOUBLE_PUSH); 
+                        moves.addSpec(new Move(this.copy(), pos, pos + move), SpecMove.DOUBLE_PUSH); 
                     }
                 }
             }
@@ -63,7 +60,7 @@ public class Pawn extends Piece {
             if (rec.epPawnPos == pos -1) {
                 // en passant left
                 if (super.inBounds(pos, move)) { 
-                    moves.addSpec(new Move(this.copy(), pos, pos + move), SpecialMove.EN_PASSANT); 
+                    moves.addSpec(new Move(this.copy(), pos, pos + move), SpecMove.EN_PASSANT); 
                 }
             }
         }
@@ -78,7 +75,7 @@ public class Pawn extends Piece {
             if (rec.epPawnPos == pos + 1) {
                 // en passant right
                 if (super.inBounds(pos, move)) { 
-                    moves.addSpec(new Move(this.copy(), pos, pos + move), SpecialMove.EN_PASSANT); 
+                    moves.addSpec(new Move(this.copy(), pos, pos + move), SpecMove.EN_PASSANT); 
                 }
             }
         }
