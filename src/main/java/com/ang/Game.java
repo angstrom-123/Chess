@@ -78,6 +78,10 @@ public class Game implements GameInterface {
     public void showMoves(int pos) {
         MoveList moves = gameRec.board[selected].getMoves(gameRec);
         for (int i = 0; i < moves.length() - 1; i++) {
+            BoardRecord tempRec = gameRec.copy();
+            if (!tempRec.tryMove(moves.at(i))) {
+                continue;
+            }
             int markX = moves.at(i).to() % 8;
             int markY = (int)Math.floor(moves.at(i).to() / 8);
             renderer.drawMarker(markX, markY);
