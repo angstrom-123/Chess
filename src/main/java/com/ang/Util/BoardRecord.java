@@ -9,8 +9,9 @@ public class BoardRecord {
     public int whiteKingPos;
     public int blackKingPos;
     public int epPawnPos;
+    public int minorPieceCount;
     public int[] piecePosArr;
-
+    
     private int piecePosEnd;
 
     public BoardRecord() {}
@@ -48,6 +49,7 @@ public class BoardRecord {
         temp.whiteKingPos = this.whiteKingPos;
         temp.blackKingPos = this.blackKingPos;
         temp.epPawnPos = this.epPawnPos;
+        temp.minorPieceCount = this.minorPieceCount;
         
         return temp;
     }
@@ -102,6 +104,11 @@ public class BoardRecord {
     }
 
     public void movePiece(Move move) {
+        PieceType taken = board[move.to()].type();
+        if ((taken == PieceType.KNIGHT) || (taken == PieceType.BISHOP)) {
+            minorPieceCount--;
+        }
+
         board[move.to()] = move.piece();
         board[move.from()] = new Piece();
         move.piece().setMoved(true);

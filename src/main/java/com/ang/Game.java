@@ -31,6 +31,7 @@ public class Game implements GameInterface {
         gameRec.whiteKingPos = 60;
         gameRec.blackKingPos = 4;
         gameRec.epPawnPos = -1;
+        gameRec.minorPieceCount = 8;
         gameRec.prefetchPiecePositions();
 
         renderer = new Renderer(SQUARE_SIZE, RENDER_SCALE, this);

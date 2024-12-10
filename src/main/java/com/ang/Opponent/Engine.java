@@ -16,46 +16,67 @@ import com.ang.Util.MoveList;
 //      - pawn position evaluation
 
 public class Engine {  
-    private int maxDepth;
-    private double endgameWeight = 1.0;
-    private double endgameThreshold = 3.0;
+    private int timeLimit;
 
-    public Engine(int maxDepth) {
-        this.maxDepth = maxDepth;
+    public Engine(int searchTime) {
+        this.timeLimit = searchTime;
     }
 
     public Move generateMove(BoardRecord rec) {
-        Move bestMove = Move.invalid();
-        PieceColour moveCol = PieceColour.BLACK;
+        Move lastDepthBest = Move.invalid();
+        int maxDepth = 1;
 
-        double bestEval = -Global.infinity;
-
-        MoveList possibleMoves = rec.possibleMoves(moveCol);
-
-        for (int i = 0; i < possibleMoves.length() - 1; i++) {
-            BoardRecord tempRec = rec.copy();
-            Move tempMove = possibleMoves.at(i);
-            
-            if (tempRec.tryMove(tempMove)) {
-                double eval = -alphaBeta(tempRec, PieceColour.opposite(moveCol),
-                        -Global.infinity, Global.infinity, maxDepth);
-
-                if (eval > bestEval) {
-                    bestEval = eval;
-                    bestMove = tempMove;
+        boolean doStop = false;
+        long endTime = System.currentTimeMillis() + timeLimit;
+        while (true) {
+            Move bestMove = Move.invalid();
+            PieceColour moveCol = PieceColour.BLACK;
+    
+            double bestEval = -Global.infinity;
+    
+            MoveList possibleMoves = rec.possibleMoves(moveCol);
+    
+            for (int i = 0; i < possibleMoves.length() - 1; i++) {
+                if (System.currentTimeMillis() >= endTime) {
+                    doStop = true;
+                    break;
                 }
+
+                BoardRecord tempRec = rec.copy();
+                Move tempMove = possibleMoves.at(i);
+                
+                if (tempRec.tryMove(tempMove)) {
+                    double eval = -alphaBeta(tempRec, PieceColour.opposite(moveCol),
+                            -Global.infinity, Global.infinity, maxDepth);
+    
+                    if (eval > bestEval) {
+                        bestEval = eval;
+                        bestMove = tempMove;
+                    }
+                }
+            }
+
+            if (doStop) {
+                break;
+            }
+
+            maxDepth++;
+
+            // TODO: implement checkmate
+            if (bestMove.isInvalid()) {
+                System.out.println("couldn't find move");
+            } else {
+                lastDepthBest = bestMove;
             }
         }
 
-        // TODO: implement checkmate
-        if (bestMove.isInvalid()) {
-            System.out.println("couldn't find move");
-        }
-        return bestMove;
+        System.out.println("maximum search depth: "+maxDepth);
+        return lastDepthBest;
     }
 
     public double alphaBeta(BoardRecord rec, PieceColour col, 
             double alpha, double beta, int depth) {
+        
         if (depth == 0) {
             double eval = evaluate(rec);
             return eval;
@@ -122,7 +143,7 @@ public class Engine {
                 value = 900.0 + Heatmap.pawnMap[heatmapIndex];
                 break;
             case PieceType.KING:
-                double[] heatmap = (endgameWeight >= endgameThreshold)
+                double[] heatmap = (rec.minorPieceCount < 3)
                 ? Heatmap.kingEndMap
                 : Heatmap.kingStartMap;
                 value = 20000.0 + heatmap[heatmapIndex];
