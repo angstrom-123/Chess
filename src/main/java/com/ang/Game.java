@@ -75,7 +75,6 @@ public class Game implements GameInterface {
         renderer.drawAllSprites(rec);
     }
 
-    // TODO : only show possible moves
     public void showMoves(int pos) {
         MoveList moves = gameRec.board[selected].getMoves(gameRec);
         for (int i = 0; i < moves.length() - 1; i++) {

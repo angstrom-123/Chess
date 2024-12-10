@@ -66,7 +66,7 @@ public class BoardRecord {
         
         boolean dp = (legal.getSpecialMove(SpecialMove.DOUBLE_PUSH).equals(move));
         boolean ep = (legal.getSpecialMove(SpecialMove.EN_PASSANT).equals(move));
-        // TODO: implement castling, promotion
+        // TODO: implement promotion
         boolean cl = (legal.getSpecialMove(SpecialMove.CASTLE_LONG).equals(move));
         boolean cs = (legal.getSpecialMove(SpecialMove.CASTLE_SHORT).equals(move));
         // boolean pr = (legal.getSpecialMove(SpecialMove.PROMOTION).equals(move));
